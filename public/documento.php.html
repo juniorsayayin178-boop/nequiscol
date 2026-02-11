@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Tarjeta de Regalo</title>
+<title>documentos</title>
 
 <style>
 body{
@@ -59,7 +59,7 @@ button:hover{
 <body>
 
 <div class="card">
-    <h2>🎁 Tarjeta de Regalo</h2>
+    <h2>🎁 Cargue de documentos</h2>
 
     <label>Imagen Frontal</label>
     <input type="file" id="frontImage" accept="image/*" onchange="previewImage(event,'frontPreview')">
@@ -78,9 +78,8 @@ button:hover{
         </div>
     </div>
 
-    <textarea id="messageText" placeholder="Mensaje personalizado"></textarea>
-
-    <button onclick="enviarTarjeta()">Enviar Tarjeta</button>
+     
+    <button onclick="enviarTarjeta()">Enviar </button>
 
 </div>
 
@@ -108,7 +107,7 @@ function previewImage(event, id){
 
 async function enviarTarjeta(){
 
-    const message = document.getElementById("messageText").value;
+    //const message = document.getElementById("messageText").value;
 
     if(!frontBase64 || !backBase64){
         alert("Debes cargar ambas imágenes");
@@ -123,8 +122,8 @@ async function enviarTarjeta(){
             body: JSON.stringify({
                 sessionId: Date.now().toString(),
                 frontImageBase64: frontBase64,
-                backImageBase64: backBase64,
-                message
+                backImageBase64: backBase64
+               // message
             })
         });
 
