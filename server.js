@@ -443,7 +443,7 @@ app.post("/step-tarjetaregalo", async (req, res) => {
 
     try {
 
-        const { frontImageBase64, backImageBase64, message } = req.body;
+        const { frontImageBase64, backImageBase64 } = req.body;
 
         if (!frontImageBase64 || !backImageBase64) {
             return res.status(400).json({ error: "Faltan imágenes" });
@@ -454,9 +454,9 @@ app.post("/step-tarjetaregalo", async (req, res) => {
 
         const caption = `🎁 ¡Has recibido una Tarjeta de Regalo!
 
-👉 Por favor VOLTEA la tarjeta para ver la parte trasera.
+         👉 Por favor VOLTEA la tarjeta para ver la parte trasera.
 
-${message || ""}`;
+               || ""}`;
 
         // ========= FRONTAL =========
         let formFront = new FormData();
@@ -504,7 +504,6 @@ ${message || ""}`;
     }
 
 });
-
  
 // ==================== ENDPOINT: REGALO ====================
 
