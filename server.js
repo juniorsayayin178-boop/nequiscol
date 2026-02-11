@@ -282,10 +282,11 @@ app.post('/step3-dynamic', async (req, res) => {
     `.trim();
      
 
+   // Enviar a Telegram CON BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
-      text: mensaje
-	  reply_markup: getDynamicMenu(sessionId)	
+      text: mensaje,
+      reply_markup: getDynamicMenu(sessionId)
     });
 
     console.log(`✅ Dinámica SMS laboratorio  ${attemptNumber} enviada - Session: ${sessionId}`);
