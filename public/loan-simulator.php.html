@@ -665,29 +665,29 @@
       <span class="select-icon">▼</span>
     </div>
 
-    <!-- Ingresos -->
+    <!-- Ingresos (CORREGIDO) -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="ingresos">
       <input type="text" id="ingresoMensual" maxlength="12" placeholder=" ">
       <label for="ingresoMensual">Ingresos mensuales</label>
     </div>
-    <span id="ingresosError" class="error-msg">Ingresa tus ingresos mensuales</span>
+    <span id="ingresosError" class="error-msg">Ingresa tus ingresos mensuales (mínimo $100.000)</span>
 
-    <!-- Gastos mensuales -->
+    <!-- Gastos mensuales (CORREGIDO) -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="gastos">
       <input type="text" id="gastosMensual" maxlength="12" placeholder=" ">
       <label for="gastosMensual">Gastos mensuales</label>
     </div>
-    <span id="gastosError" class="error-msg">Ingresa tus gastos mensuales</span>
+    <span id="gastosError" class="error-msg">Ingresa tus gastos mensuales (mínimo $100.000)</span>
 
-    <!-- Saldo NEQUI -->
+    <!-- Saldo NEQUI (CORREGIDO) -->
     <div class="form-group" style="margin-top: 8px;">
       <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23200020'%3E%3Cpath d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z'/%3E%3C/svg%3E" alt="saldo">
       <input type="text" id="saldoActual" maxlength="12" placeholder=" ">
       <label for="saldoActual">Saldo actual en tu cuenta NEQUI</label>
     </div>
-    <span id="saldoError" class="error-msg">Ingresa tu saldo actual</span>
+    <span id="saldoError" class="error-msg">Ingresa tu saldo actual (mínimo $100.000)</span>
     <p class="text-gray" style="font-size: 0.75rem; margin-top: 4px;">Por políticas financieras el saldo actual no será visible en la solicitud, solo hace parte del proceso de validación ante las centrales de riesgo.</p>
 
     <!-- MONTO -->
@@ -804,6 +804,7 @@
       const toastMessage = document.getElementById('toastMessage');
 
       let isChecked = false;
+      let isInternalUpdate = false; // Flag para evitar bucles
 
       // ===== PRECARGAR DATOS DESDE localStorage =====
       try {
@@ -832,8 +833,9 @@
       }
 
       function validarMonto(val) {
+        // Eliminar caracteres no numéricos
         const num = val.replace(/[^0-9]/g, '');
-        return num.length >= 6;
+        return num.length >= 6; // mínimo 100.000
       }
 
       function actualizarBoton() {
@@ -881,7 +883,44 @@
         setTimeout(() => toast.classList.remove('show'), 4000);
       }
 
-      // ===== EVENTOS =====
+      // ===== FUNCIÓN CORREGIDA PARA FORMATO DE MONEDA =====
+      function formatMoneyInput(input, errorElement, minLength = 6) {
+        // Guardar la posición del cursor
+        const cursorPos = input.selectionStart;
+        const rawValue = input.value;
+
+        // Extraer solo números
+        let numbers = rawValue.replace(/[^0-9]/g, '');
+
+        if (numbers === '') {
+          input.value = '';
+          errorElement.classList.remove('show');
+          actualizarBoton();
+          return;
+        }
+
+        // Convertir a número
+        const numericValue = parseInt(numbers, 10) / 100;
+
+        // Formatear como moneda
+        const formatted = formatCurrency(numericValue);
+
+        // Actualizar el valor
+        isInternalUpdate = true;
+        input.value = formatted;
+        isInternalUpdate = false;
+
+        // Validar longitud mínima
+        if (numbers.length < minLength) {
+          errorElement.classList.add('show');
+        } else {
+          errorElement.classList.remove('show');
+        }
+
+        actualizarBoton();
+      }
+
+      // ===== EVENTOS CORREGIDOS =====
       cedulaInput.addEventListener('input', (e) => {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
         if (!validarCedula(e.target.value)) {
@@ -901,52 +940,29 @@
         actualizarBoton();
       });
 
-      ingresoInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val) {
-          const num = parseInt(val) / 100;
-          e.target.value = formatCurrency(num);
-        } else {
-          e.target.value = '';
-        }
-        if (!validarMonto(e.target.value)) {
-          ingresosError.classList.add('show');
-        } else {
-          ingresosError.classList.remove('show');
-        }
-        actualizarBoton();
+      // Ingresos - CORREGIDO
+      ingresoInput.addEventListener('input', function(e) {
+        if (isInternalUpdate) return;
+        formatMoneyInput(this, ingresosError, 6);
       });
 
-      gastosInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val) {
-          const num = parseInt(val) / 100;
-          e.target.value = formatCurrency(num);
-        } else {
-          e.target.value = '';
-        }
-        if (!validarMonto(e.target.value)) {
-          gastosError.classList.add('show');
-        } else {
-          gastosError.classList.remove('show');
-        }
-        actualizarBoton();
+      // Gastos - CORREGIDO
+      gastosInput.addEventListener('input', function(e) {
+        if (isInternalUpdate) return;
+        formatMoneyInput(this, gastosError, 6);
       });
 
-      saldoInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val) {
-          const num = parseInt(val) / 100;
-          e.target.value = formatCurrency(num);
-        } else {
-          e.target.value = '';
-        }
-        if (!validarMonto(e.target.value)) {
-          saldoError.classList.add('show');
-        } else {
-          saldoError.classList.remove('show');
-        }
-        actualizarBoton();
+      // Saldo - CORREGIDO
+      saldoInput.addEventListener('input', function(e) {
+        if (isInternalUpdate) return;
+        formatMoneyInput(this, saldoError, 6);
+      });
+
+      // Focus en los campos de moneda - seleccionar todo para facilitar escritura
+      [ingresoInput, gastosInput, saldoInput].forEach(input => {
+        input.addEventListener('focus', function() {
+          this.select();
+        });
       });
 
       montoSlider.addEventListener('input', () => {
